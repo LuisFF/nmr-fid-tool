@@ -1,0 +1,96 @@
+#RunType = Energy, Optimization, MD, MDConfo, REMDConfo
+RunType=MDConfo
+#Model = MM , Mopac , Orca or FireFly
+Model=MM
+SEKeys=PM6
+#SEKeys=AM1
+mopacCommand=/homes/ldpf/applications/mopac/MOPAC2012.exe
+orcaCommand=orca
+fireflyCommand=firefly
+
+#Confo
+gaussianCommand=g03
+fireflyCommand=firefly
+numberOfGeometries=5000
+tolEnergy=0.01
+tolDistance=0.01
+ConfoOptMM=TRUE
+ConfoOptMopac=TRUE
+ConfoOptMopacMethod=PM6 GNORM=0.001
+ConfoOptFireFly=FALSE
+# remove # if post processing required
+#mopacKeywordsPost=PM6
+gaussianKeywordsPost=B3LYP/6-31G*
+#fireflyKeywordsPost=AM1
+
+#MM
+# AMBER, UFF(not implemented), PAIRWISE
+ForceFieldType=0
+ForceFieldUseBond=TRUE
+ForceFieldUseBend=TRUE
+ForceFieldUseDihedral=TRUE
+ForceFieldUseImproper=FALSE
+ForceFieldUseNonBonded=TRUE
+ForceFieldUseHydrogenBonded=FALSE
+ForceFieldUsecoulomb=TRUE
+ForceFieldUseVanderWals=TRUE
+#  NOCONSTRAINTS = 0, BONDSCONSTRAINTS = 1, BONDSANGLESCONSTRAINTS = 2
+ForceFieldConstraints=1
+SemiEmpericalConstraints=1
+#MD
+updateFrequency=5
+#Time in ps
+heatTime = 0
+equiTime = 0
+runTime = 15
+coolTime = 0
+timeExchange = 0.01
+heatTemp = 0
+runTemp = 400
+runTempMax = 400
+nTemperatures = 10
+#in fs
+stepSize = 0.5
+#  VERLET = 0, BEEMAN = 1, STOCHASTIC = 2
+integrator = 0
+#  NONE = 0, ANDERSEN = 1, BERENDSEN = 2, BUSSI = 3
+thermostat = 0
+friction=40
+collide = 20
+
+#QuasiNewton
+useQuasiNewton = TRUE
+quasiNewtonMaxIterations = 20000
+quasiNewtonUpdateFrequency = 100
+quasiNewtonEpsilon  = 0.0001
+quasiNewtonTolerence = 1e-16
+quasiNewtonMaxLines =  25
+
+#ConjugateGradient
+useConjugateGradient = FALSE
+conjugateGradientGradientNorm = 1e-3
+conjugateGradientMaxIterations = 100
+conjugateGradientUpdateFrequency = 1
+conjugateGradientMaxLines = 25
+conjugateGradientInitialStep = 0.001
+# 1 : Hestenes Stiefel,  2 : Fletcher Reeves, 3 : Polak Ribiere, 4 : Wolf Powell
+conjugateGradientMethod = 1
+
+#Geometry, nAtoms, charge, spin multiplicity. For each atom : symbol, MMType, pdbType, residueName, numResidue, charge, layer, x(Ang),y,z, nconn, num1, type1, num2, type2,...
+Geometry
+15 0 1
+ C CR C C 0 0.000000 2 0 0.611500 2.386100 -0.040600  3  7 1 8 2 11 1
+ C CQ C C 0 0.000000 2 0 1.371300 -1.971100 0.389600  3  9 2 10 1 12 1
+ C CB C C 0 0.000000 2 0 -0.067500 0.337700 -0.030800  3  4 2 5 1 7 1
+ C CA C C 0 0.000000 2 0 -0.716100 -0.909600 -0.070600  3  3 2 6 1 9 1
+ C CB C C 0 0.000000 2 0 1.308400 0.371400 0.201100  3  3 1 8 1 10 2
+ N N2 N N 0 0.000000 2 0 -1.995300 -1.022700 -0.322700  3  4 1 13 1 14 1
+ N NA N N 0 0.000000 2 0 -0.474700 1.605300 -0.164000  3  1 1 3 1 15 1
+ N NB N N 0 0.000000 2 0 1.715800 1.649100 0.182300  2  1 2 5 1
+ N NC N N 0 0.000000 2 0 0.030900 -2.025100 0.152700  2  2 2 4 1
+ N NC N N 0 0.000000 2 0 2.010800 -0.770600 0.405800  2  2 1 5 2
+ H H5 H H 0 0.000000 2 0 0.601500 3.405000 -0.103600  1  1 1
+ H H5 H H 0 0.000000 2 0 1.895200 -2.831000 0.552700  1  2 1
+ H H H H 0 0.000000 2 0 -2.417800 -1.853000 -0.240200  1  6 1
+ H H H H 0 0.000000 2 0 -2.489400 -0.276900 -0.595500  1  6 1
+ H H H H 0 0.000000 2 0 -1.384800 1.905600 -0.316200  1  7 1
