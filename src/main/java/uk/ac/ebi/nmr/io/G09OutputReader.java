@@ -103,32 +103,34 @@ public class G09OutputReader extends DefaultChemObjectReader {
     private final static Pattern REGEX_CONNECTION_TABLE = Pattern.compile("Initial Parameters");
     // assume that at least there is one digit in the left of the decimal place
     private final static Pattern REGEX_INIT_SET_COORDINATES = Pattern
-            .compile("\\s?(\\w+?)\\s+(-?\\d+\\.\\d*)\\s+(-?\\d+\\.\\d*)\\s+(-?\\d+\\.\\d*)");
+            .compile("\\s?(\\w+|\\d+)\\s+(-?\\d+\\.\\d*)\\s+(-?\\d+\\.\\d*)\\s+(-?\\d+\\.\\d*)");
     private final static Pattern REGEX_BOND_EDGE = Pattern
             .compile("R\\d+\\s+R\\((\\d+),(\\d+)\\)\\s+?(-?\\d+\\.\\d*)");
 
     private final static Pattern REGEX_END_TABLE= Pattern.compile("------------------");
 
     // geometry table and parameters
-    private final static Pattern REGEX_GEOMETRY_START = Pattern.compile("Standard orientation:");
+    private final static Pattern REGEX_GEOMETRY_START = Pattern.compile("Input orientation:");
     private final static Pattern REGEX_OPTIMIZED_GEOMETRY = Pattern.compile("\\s+(\\d+)\\s+(\\d+)\\s+\\d+\\s+"+
                             "(-?\\d+\\.\\d+)\\s+(-?\\d+\\.\\d+)\\s+(-?\\d+\\.\\d+)");
 
     private final static Pattern REGEX_SCF_ENERGY = Pattern.compile("SCF Done:.+=\\s*(-?\\d+\\.\\d*).+(\\d+)\\scycles");
 
     // NMR tables
-    private final static Pattern REGEX_NMR_PARAMETERS_START = Pattern.compile("Calculating GIAO");
-    private final static Pattern REGEX_NMR_PARAMETERS_STOP = Pattern.compile("\\*\\*\\*\\*\\*");
+    private final static Pattern REGEX_NMR_PARAMETERS_START = Pattern.compile("(Calculating GIAO)|(NMR Shielding)");
+    protected final static Pattern REGEX_NMR_PARAMETERS_STOP = Pattern.compile("(\\*\\*\\*\\*\\*)|(==========)");
 
-    private final static Pattern REGEX_SS_COUPLING_FLAG = Pattern.compile("Total nuclear spin-spin coupling J");
-    private final static Pattern REGEX_MAGNETIC_TENSOR_TABLE = Pattern.compile("\\s+(\\d+)\\s+(\\w+)\\s+" +
-            "Isotropic\\s=\\s+(-?\\d+\\.\\d*)\\s+" +
-            "Anisotropy\\s=\\s+(-?\\d+\\.\\d*)");
-    private final static Pattern REGEX_SS_COUPLING_HEADER_FLAG = Pattern
+    protected final static Pattern REGEX_SS_COUPLING_FLAG = Pattern.compile("Total nuclear spin-spin coupling J");
+    private final static Pattern REGEX_MAGNETIC_TENSOR_TABLE = Pattern.compile(
+            "\\s+(\\d+)\\s+(\\w+)\\s+Isotropic\\s=\\s+(-?\\d+\\.\\d*(D-?\\+?\\d{2})?)");
+//    private final static Pattern REGEX_MAGNETIC_TENSOR_TABLE02 = Pattern.compile(
+//            "\\s+(\\d+)\\s+(\\w+)\\s+Isotropic\\s=\\s+(-?\\d+\\.\\d{10}D-?\\+?\\d{2})");
+
+    protected final static Pattern REGEX_SS_COUPLING_HEADER_FLAG = Pattern
             .compile("\\s{8}");
-    private final static Pattern REGEX_SS_COUPLING_DIAGONAL = Pattern
+    protected final static Pattern REGEX_SS_COUPLING_DIAGONAL = Pattern
             .compile("\\s+(\\d+)\\s+(-?\\d+\\.\\d{6}D-?\\+?\\d{2})");
-    private final static Pattern REGEX_SS_COUPLING = Pattern
+    protected final static Pattern REGEX_SS_COUPLING = Pattern
             .compile("\\s+(-?\\d+\\.\\d{6}D-?\\+?\\d{2})");
 
     private final static Pattern REGEX_LEVEL_OF_THEORY = Pattern.compile("GINC");
@@ -137,7 +139,7 @@ public class G09OutputReader extends DefaultChemObjectReader {
 
     private static String levelOfTheory;
 
-    private BufferedReader input;
+    protected BufferedReader input;
     private static ILoggingTool logger =
             LoggingToolFactory.createLoggingTool(G09OutputReader.class);
 
@@ -348,7 +350,7 @@ public class G09OutputReader extends DefaultChemObjectReader {
 //            }
             countEndTablePattern+=(REGEX_END_TABLE.matcher(line).find())?1:0;
             // this is a weak way of breaking the reading
-            if ((line == null) || (countEndTablePattern > 3)) {
+            if ((line == null) || (countEndTablePattern > 1)) {
                 break;
             }
         }
@@ -532,14 +534,22 @@ public class G09OutputReader extends DefaultChemObjectReader {
         boolean couplingTableFlag = false;
         List<Integer> couplingHeader=null;
         int matchEnd=0;
-
+        // reset magnetic properties...
+        // this is required for the l777 link
+        // and it ensures that only the las set of parameters is recorded
+        for (IAtom atom : atomContainer.atoms()){
+            atom.setProperty(COUPLING_CONSTANTS, null);
+            atom.setProperty(MAGNETIC_TENSOR, null);
+        }
+        // read the new magnetic parameters
         while (line != null && !REGEX_NMR_PARAMETERS_STOP.matcher(line).find()) {
             // extract the isotropic magnetic shielding tensor
             if (REGEX_MAGNETIC_TENSOR_TABLE.matcher(line).find()) {
                 matcher = REGEX_MAGNETIC_TENSOR_TABLE.matcher(line);
                 matcher.find();
                 atomContainer.getAtom(Integer.parseInt(matcher.group(1)) - 1)
-                        .setProperty(MAGNETIC_TENSOR, Double.parseDouble(matcher.group(3)));
+                        .setProperty(MAGNETIC_TENSOR, Double.parseDouble(
+                                matcher.group(3).replace("D", "E")));
             }
 
             couplingTableFlag=(couplingTableFlag || REGEX_SS_COUPLING_FLAG.matcher(line).find());
@@ -573,11 +583,11 @@ public class G09OutputReader extends DefaultChemObjectReader {
                         if(!couplingHeader.get(indexCount).equals(atomID)){
                             // define hashmap if property is not yet set
                             if(atomContainer.getAtom(atomID).getProperty(COUPLING_CONSTANTS)==null)
-                                atomContainer.getAtom(atomID).setProperty(COUPLING_CONSTANTS,new HashMap<IAtom,Float>());
+                                atomContainer.getAtom(atomID).setProperty(COUPLING_CONSTANTS,new HashMap<IAtom,Double>());
                             // add a mapping between atom and coupling value
-                            ((HashMap<IAtom,Float>) atomContainer.getAtom(atomID).getProperty(COUPLING_CONSTANTS))
+                            ((HashMap<IAtom,Double>) atomContainer.getAtom(atomID).getProperty(COUPLING_CONSTANTS))
                                     .put(atomContainer.getAtom(couplingHeader.get(indexCount)),
-                                            Float.parseFloat(matcher.group(1).replace("D", "E")));
+                                            Double.parseDouble(matcher.group(1).replace("D", "E")));
                         }
                         indexCount++;
                     }
