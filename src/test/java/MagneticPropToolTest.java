@@ -128,7 +128,7 @@ public class MagneticPropToolTest {
                     if (i != j && spinSystemH.getNumberOfSpins()[i] != 0 && spinSystemH.getNumberOfSpins()[j] != 0) {
 
                         if (spinSystemH.getConstantJMatrix()[i][j] != 0)
-                            Assert.assertEquals("Wrong coupling constant", 7.865124940872192,
+                            Assert.assertEquals("Wrong coupling constant", 7.865125,
                                     spinSystemH.getConstantJMatrix()[i][j]);
                     }
 

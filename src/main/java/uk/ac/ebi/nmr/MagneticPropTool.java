@@ -263,7 +263,7 @@ public class MagneticPropTool {
                             avgMagneticTensor[i] += (Double) spins.getProperty(G09OutputReader.MAGNETIC_TENSOR);
                             // iterate through all hydrogens that are coupled with this one and check to which class their
                             // carbon belongs to and update the coupling value to that equivalent classes
-                            HashMap<IAtom, Float> coupledAtoms = (HashMap<IAtom, Float>) spins
+                            HashMap<IAtom, Double> coupledAtoms = (HashMap<IAtom, Double>) spins
                                     .getProperty(G09OutputReader.COUPLING_CONSTANTS);
                             for (IAtom coupleAtom : coupledAtoms.keySet()) {
                                 if (coupleAtom.getSymbol().equals("H")) {
@@ -278,7 +278,7 @@ public class MagneticPropTool {
                                     IAtom connectedAtom = originalAtomContainer.getConnectedAtomsList(coupleAtom).get(0);
                                     if (connectedAtom.getSymbol().equals("C") && (Integer) connectedAtom.getProperty(EQUIVALENT_CLASS) != (i + 1))
                                         avgCouplingConstant[i][((Integer) connectedAtom.getProperty(EQUIVALENT_CLASS)) - 1] +=
-                                                coupledAtoms.get(coupleAtom).doubleValue();
+                                                coupledAtoms.get(coupleAtom);
                                 }
                             }
                         }

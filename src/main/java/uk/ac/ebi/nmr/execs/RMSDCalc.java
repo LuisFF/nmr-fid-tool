@@ -287,7 +287,7 @@ public class RMSDCalc {
             molWriter.close();
 
             //
-            String header1 = "%mem=64GB\n" +
+            String header1 = "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%chk=conf_" + index + ".chk\n" +
                     "# B3LYP/6-31+G Opt=loose int=grid=sg1 Test\n\n" +
@@ -296,7 +296,7 @@ public class RMSDCalc {
                     "\n[Gas-Phase]\n" +
                     "\n" +
                     "0,1\n";
-            String header2 = "%mem=64GB\n" +
+            String header2 = "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%chk=conf_" + index + "_solvent.chk\n" +
                     "# B3LYP/6-31+G Opt=loose int=grid=sg1 Test SCRF=(PCM,solvent=Water)\n\n" +
@@ -307,7 +307,7 @@ public class RMSDCalc {
                     "0,1\n";
 
             String footer1 = "\n\n--link1--\n" +
-                    "%mem=64GB\n" +
+                    "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%nosave\n" +
                     "%chk=conf_" + index + ".chk\n" +
@@ -317,7 +317,7 @@ public class RMSDCalc {
                     " perform a better optimization\n" +
                     "\n" +
                     "--link1--\n" +
-                    "%mem=64GB\n" +
+                    "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%chk=conf_" + index + ".chk\n" +
                     "# B3LYP/6-311++G** Freq Test Geom=allcheck Guess=Tcheck\n" +
@@ -325,7 +325,7 @@ public class RMSDCalc {
                     " calculate Frequencies and Energies\n" +
                     "\n" +
                     "--link1--\n" +
-                    "%mem=64GB\n" +
+                    "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%chk=conf_" + index + ".chk\n" +
                     "# B3LYP/6-311++G** NMR Test Geom=allcheck Guess=read\n" +
@@ -333,7 +333,7 @@ public class RMSDCalc {
                     " calculate the Magnetic tensors\n" +
                     "\n" +
                     "--link1--\n" +
-                    "%mem=64GB\n" +
+                    "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%chk=conf_" + index + ".chk\n" +
                     "# B3LYP/6-311++G** NMR=mixed Test Geom=allcheck Guess=read\n" +
@@ -343,7 +343,7 @@ public class RMSDCalc {
                     "\n";
 
             String footer2 = "\n\n--link1--\n" +
-                    "%mem=64GB\n" +
+                    "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%nosave\n" +
                     "%chk=conf_" + index + "_solvent.chk\n" +
@@ -353,7 +353,7 @@ public class RMSDCalc {
                     " perform a better optimization\n" +
                     "\n" +
                     "--link1--\n" +
-                    "%mem=64GB\n" +
+                    "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%chk=conf_" + index + "_solvent.chk\n" +
                     "# B3LYP/6-311++G** Freq Test Geom=allcheck Guess=Tcheck SCRF=(PCM,solvent=Water)\n" +
@@ -361,7 +361,7 @@ public class RMSDCalc {
                     " calculate Frequencies and Energies\n" +
                     "\n" +
                     "--link1--\n" +
-                    "%mem=64GB\n" +
+                    "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%chk=conf_" + index + "_solvent.chk\n" +
                     "# B3LYP/6-311++G** NMR Test Geom=allcheck Guess=read SCRF=(PCM,solvent=Water)\n" +
@@ -369,7 +369,7 @@ public class RMSDCalc {
                     " calculate the Magnetic tensors\n" +
                     "\n" +
                     "--link1--\n" +
-                    "%mem=64GB\n" +
+                    "%mem=40MW\n" +
                     "%nproc=12\n" +
                     "%chk=conf_" + index + "_solvent.chk\n" +
                     "# B3LYP/6-311++G** NMR=mixed Test Geom=allcheck Guess=read SCRF=(PCM,solvent=Water)\n" +
