@@ -1,0 +1,18 @@
+##TITLE= Parameter file, TOPSPIN		Version 2.1
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 257	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= mfjofre
+$$ 2010-12-29 16:17:57.313 -0600  mfjofre@kerry
+$$ /opt/topspin216/data/mfjofre/nmr/cq_00098 -100mm-d2o-12-23-10/7/acqu2s
+$$ process /opt/topspin216/prog/mod/go
+##$BF1= 125.684868
+##$FnMODE= 1
+##$NUC1= <13C>
+##$O1= 12568.4868
+##$SFO1= 125.6974364868
+##$SW= 236
+##$SW_h= 29664.5950108848
+##$TD= 256
+##END=

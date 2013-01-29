@@ -1,0 +1,44 @@
+##TITLE= Audit trail, TOPSPIN		Version 2.1
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= mfjofre
+$$ /banyo2/data/mfjofre/nmr/cq_00098-100mm-d2o-12-23-10/2/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2010-12-29 12:09:07.947 -0600>,<mfjofre>,<kerry>,<go>,<TOPSPIN 2.1>,
+      <created by zg
+	started at 2010-12-29 10:52:07.781 -0600,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       56 1D EC 01 B1 83 A9 D2 5F 72 2D BD F1 F7 E8 37
+       data hash MD5: 2K * 256
+       E8 3E 14 C8 32 2A FA 25 7D 12 D3 B2 92 57 AA 51>)
+(   2,<2010-12-29 12:09:08.076 -0600>,<mfjofre>,<kerry>,<audit>,<TOPSPIN 2.1>,
+      <user comment:
+       ICON-NMR User ID: mfjofre
+       data hash MD5: 2K * 256
+       E8 3E 14 C8 32 2A FA 25 7D 12 D3 B2 92 57 AA 51>)
+(   3,<2011-01-07 10:33:20.320 -0600>,<mfjofre>,<watusi.nmrfam.wisc.edu>,<proc2d>,<TOPSPIN 2.1>,
+      <Start of raw data processing
+       xfb F2: SI = 1K WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 PHC0 = 95.00625 PHC1 = -70.4 F1: SI = 1K WDW = 4 SSB = 2 FT_mod = 4 PHC0 = 181.176 PHC1 = -185
+       data hash MD5: 1K * 1K
+       CC 34 FC EE 6C 38 BD F9 72 FC E8 04 ED AA 94 81>)
+(   4,<2011-01-12 11:46:25.608 -0600>,<mfjofre>,<watusi.nmrfam.wisc.edu>,<proc2d>,<TOPSPIN 2.1>,
+      <pk2 fgphup F2: PHC0 = 41.5 PHC1 = -3.8
+       data hash MD5: 1K * 1K
+       AF BC 2A 66 0F 6C 23 14 F7 E2 96 06 63 32 F3 C7>)
+(   5,<2011-01-12 11:46:55.200 -0600>,<mfjofre>,<watusi.nmrfam.wisc.edu>,<proc2d>,<TOPSPIN 2.1>,
+      <pk2 fgphup F2: PHC0 = -1.35 PHC1 = 2.7
+       data hash MD5: 1K * 1K
+       27 80 4F 65 87 79 02 F5 34 E0 79 D5 C7 88 8E 5F>)
+(   6,<2011-01-12 11:47:07.121 -0600>,<mfjofre>,<watusi.nmrfam.wisc.edu>,<proc2d>,<TOPSPIN 2.1>,
+      <pk1 fgphup F1: PHC0 = -4.575 PHC1 = 9.15
+       data hash MD5: 1K * 1K
+       45 CD F3 10 07 C1 DB E9 EF E5 BA 8A CB 7C 21 D6>)
+(   7,<2011-01-12 11:50:08.943 -0600>,<mfjofre>,<watusi.nmrfam.wisc.edu>,<proc2d>,<TOPSPIN 2.1>,
+      <pk2 fgphup F2: PHC0 = -0.2375 PHC1 = 0
+       data hash MD5: 1K * 1K
+       4F 28 72 52 9E 4A 13 EE 85 0F F0 0F 20 15 F5 B5>)
+##END=
+
+$$ hash MD5
+$$ FA 0E AB 64 AD 26 DD 22 81 27 E4 BA E0 DC C9 A6

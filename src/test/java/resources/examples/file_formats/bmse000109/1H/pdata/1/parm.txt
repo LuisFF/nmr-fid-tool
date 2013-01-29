@@ -1,0 +1,38 @@
+NAME     cq_00098-100mm-d2o-12-23-10                
+EXPNO                 1                
+PROCNO                1                
+Date_          20101229                
+Time              10.19                
+INSTRUM           spect                
+PROBHD   5 mm CPTXO 13C                
+PULPROG          zgcppr                
+TD                19478                
+SOLVENT             D2O                
+NS                   16                
+DS                    4                
+SWH            6493.506 Hz             
+FIDRES         0.333376 Hz             
+AQ            1.4998560 sec            
+RG                   36                
+DW               77.000 usec           
+DE                30.00 usec           
+TE                298.0 K              
+D1           2.00000000 sec            
+D12          0.00002000 sec            
+TD0                   1                
+
+======== CHANNEL f1 ========
+NUC1                 1H                
+P1                16.06 usec           
+PL1                0.90 dB             
+PL9               50.76 dB             
+PL1W        21.64242172 W              
+PL9W         0.00022326 W              
+SFO1        499.8423492 MHz            
+SI                32768                
+SF          499.8400000 MHz            
+WDW                  EM                
+SSB                   0                
+LB                 0.30 Hz             
+GB                    0                
+PC                 1.00                
