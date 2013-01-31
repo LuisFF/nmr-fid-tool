@@ -69,6 +69,15 @@ public abstract class AbstractFastFourierTransformTool {
         apodizedData = apodization.getSpectrum();
         return implementedFFT(apodizedData);
     }
+    
+    double[] getRealPart(double[] data) {
+        double[] realPart = new double[data.length/2];
+        int realIndex = 0;
+        for (int i = 0; i < data.length; i+=2) {
+            realPart[realIndex++] = data[i];
+        }
+        return realPart;
+    }
 
     public Acqu getAcquisition() {
         return acquisition;

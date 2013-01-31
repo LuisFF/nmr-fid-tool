@@ -54,7 +54,7 @@ public class JTransformFFTTool extends AbstractFastFourierTransformTool implemen
     double[] implementedFFT(double[] apodizedData) {
         DoubleFFT_1D dfftd = new DoubleFFT_1D(apodizedData.length/2);
         dfftd.complexForward(apodizedData);
-        return apodizedData;
+        return getRealPart(apodizedData);
     }
 
     public void fft(boolean isForward) {

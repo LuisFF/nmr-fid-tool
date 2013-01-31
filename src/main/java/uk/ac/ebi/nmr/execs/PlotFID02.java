@@ -38,28 +38,23 @@ public class PlotFID02 {
 
         dataset = new XYSeriesCollection();
         final XYSeries data = new XYSeries("data");
-        Acqu acquisition = null;
-
-        
-        acquisition = (new AcquReader(PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/acqu"))).read();
-
-
-
-        InputStream fidInput = PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/fid");
-        Fid fid = null;
-        double[] spectrum = null;
+        Acqu acquisition = (new AcquReader(PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/acqu"))).read();
+        InputStream fidInput = PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/fid");                  
         FastFourierTransformTool ft;
 
-        fid = new FidReader(fidInput, acquisition).read();
-        //ft = new LdpfsFourierTransformTool(fid,acquisition);
+        Fid fid = new FidReader(fidInput, acquisition).read();
         ft = new JTransformFFTTool(fid, acquisition);
 
 
-        spectrum = ft.computeFFT();
+        Long milis = System.currentTimeMillis();
+        double[] spectrum = ft.computeFFT();
+        System.out.println("FFT timimg "+ft.getClass().getCanonicalName()+" "+(System.currentTimeMillis() - milis)+" ms ");
 //                ft.fft(true);
 //                spectrum=ft.getData();
-        for (int i = 0; i < fid.getData().length; i++) {
-            data.add(i * ft.getProcessing().getDwellTime(), spectrum[i]);
+        //for (int i = 0; i < fid.getData().length; i++) {
+        for (int i = 0; i < spectrum.length; i++) {
+            //data.add(i * ft.getProcessing().getDwellTime(), spectrum[i]); 
+            data.add(i*ft.getProcessing().getDwellTime()/(acquisition.getAquiredPoints()*ft.getProcessing().getDwellTime()), spectrum[i]);
         }
 //            data.add(3, 2); //Point 1
 //            data.add(1, 1); //Point 2
