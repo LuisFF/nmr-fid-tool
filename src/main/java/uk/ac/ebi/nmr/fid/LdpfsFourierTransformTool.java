@@ -9,21 +9,7 @@ import uk.ac.ebi.nmr.fid.tools.ApodizationTool;
  * Time: 14:02
  * To change this template use File | Settings | File Templates.
  */
-public class LdpfsFourierTransformTool implements FastFourierTransformTool {
-
-    Acqu acquisition;
-    Proc processing;
-    Fid fid;
-
-    double[] data;               //proc_buffer   apodization::transform::do_fft
-
-
-
-
-
-
-    public LdpfsFourierTransformTool() {
-    }
+public class LdpfsFourierTransformTool extends AbstractFastFourierTransformTool implements FastFourierTransformTool {
 
     public LdpfsFourierTransformTool(Fid fid, Acqu acquisition) throws Exception{                
         this.processing = new Proc(acquisition);        
@@ -31,113 +17,9 @@ public class LdpfsFourierTransformTool implements FastFourierTransformTool {
     }
 
     public LdpfsFourierTransformTool(Fid fid, Acqu acquisition, Proc processing) {
-
         this.fid=fid;
         this.acquisition=acquisition;
         this.processing=processing;
-
-        // instanciating the array where the fourier transformed spectra will be stored....
-        switch (acquisition.getAcquisitionMode()) {
-            case DISP:
-            case SIMULTANIOUS:
-                data =new double[2*processing.getTransformSize()];// allocate space for processing
-                break;
-            case SEQUENTIAL:
-                data =new double[4*processing.getTransformSize()];// allocate space for processing
-                break;
-            default:
-                break;
-        }
-
-        // perform a left or right shift of the data (ignoring the corresponding portion of the data)
-        // the code from cuteNMR was simplified
-        for (int i =0; i< (processing.getTdEffective()- Math.abs(processing.getShift())); i++ ) {
-                int dataIndex = (processing.getShift()>=0)?
-                        i :                             // start in the correct order
-                        i - processing.getShift();      // or shift the placement of the data to the right
-                int fidIndex = (processing.getShift()>=0)?
-                        i + processing.getShift() :     // shift the data to the left (ignore the first indexes)
-                        i;                              // start in the correct order
-            switch (acquisition.getFidType()){
-                case INT32:
-                    data[dataIndex]=(double) fid.getData()[fidIndex];
-                    break;
-                case DOUBLE:
-                    data[dataIndex]=fid.getData()[fidIndex];
-                    break;
-                case FLOAT:
-                    break;
-                case INT16:
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        // for sequential data apply Redfield trick: multiply data by 1 -1 -1 1
-        if(acquisition.getAcquisitionMode().equals(Acqu.AcquisitionMode.SEQUENTIAL)){
-            for (int i = 0; i < processing.getTdEffective(); i+=4) {
-                data[i+1] = -(data[i+1]);
-                data[i+2] = -(data[i+2]);
-            }
-        }
-
-        //// try to understand this bit of code!!!!
-        //nonsense case if SI is set to be less than TD/2
-        int td = (processing.getTdEffective() > 2 * processing.getTransformSize())?
-                2 * processing.getTransformSize() :
-                processing.getTdEffective();
-
-        // move the data from position i to position 2*i, why?
-        if(acquisition.getAcquisitionMode().equals(Acqu.AcquisitionMode.SEQUENTIAL)){
-            for (int i =td -1; i>0; i-- ){
-                data[2*i] = data[i];
-                data[i]=0;
-            }
-        }
-        /////////////////////////////////////////////
-
-
-
-    }
-
-    @Override
-    public double [] computeFFT(){
-        int signals;
-        processing.setLineBroadning(0.3);
-        /// applyWindowFunctions //window function need to be applied before FT
-        ApodizationTool apodization = new ApodizationTool(data, acquisition.getAcquisitionMode(), processing);
-        ApodizationTool apodization2 = new ApodizationTool(data, acquisition.getAcquisitionMode(), processing);
-        try {
-            apodization.exponential();
-            double[] data1 = apodization.getSpectrum();
-//            apodization2.gaussian(0.3);
-            double[] data2 = apodization2.getSpectrum();
-            double[] difference = new double[data1.length];
-            for (int i =0 ; i< data1.length; i++){
-                difference[i]= data1[i]-data2[i];
-            }
-
-            return data1;
-
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        return apodization.getSpectrum();
-
-        // circular_lsp //if manually chosen, do cls // no used in cuteNMR
-
-//        if (acquisition.getAcquisitionMode().equals(Acqu.AcquisitionMode.SIMULTANIOUS) ||
-//                acquisition.getAcquisitionMode().equals(Acqu.AcquisitionMode.DISP)){
-//            signals = processing.getTransformSize();
-//        }
-//
-//        if (acquisition.getAcquisitionMode().equals(Acqu.AcquisitionMode.SEQUENTIAL)){
-//            signals = 2*processing.getTransformSize();
-//        }
-
-//        return null;
-
     }
 
     /**
@@ -145,7 +27,6 @@ public class LdpfsFourierTransformTool implements FastFourierTransformTool {
      * @return
      */
 
-    @Override
     public void fft(boolean isForward) {
         int j =1;
         int numberOfPairs=2*processing.getTransformSize();
@@ -219,29 +100,13 @@ public class LdpfsFourierTransformTool implements FastFourierTransformTool {
         return k;
     }
 
-
-    public Acqu getAcquisition() {
-        return acquisition;
-    }
-
-    public Proc getProcessing() {
-        return processing;
-    }
-
-    public Fid getFid() {
-        return fid;
-    }
-
-    public double[] getData() {
-        return data;
-    }
-
-    public void setData(double[] data) {
-        this.data = data;
-    }
-
-    public void setData(int index, double point) {
-        this.data[index] = point;
+    /**
+     * This is where the implementation of each fft package go.
+     * @param apodizedData
+     * @return 
+     */
+    double[] implementedFFT(double[] apodizedData) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
 

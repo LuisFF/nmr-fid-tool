@@ -17,6 +17,10 @@ import uk.ac.ebi.nmr.fid.io.AcquReader;
 import uk.ac.ebi.nmr.fid.io.FidReader;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import uk.ac.ebi.nmr.fid.FastFourierTransformTool;
+import uk.ac.ebi.nmr.fid.JTransformFFTTool;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,7 +35,7 @@ public class PlotFID02 {
         private XYSeriesCollection dataset;
 
         public static void main (String[] args) {
-            new PlotFID02();
+            new PlotFID02().showGraph();
         }
 
         public PlotFID02() {
@@ -41,20 +45,22 @@ public class PlotFID02 {
             Acqu acquisition = null;
 
             try {
-                acquisition = new AcquReader("/Users/ldpf/SVN/ldpf/dev/nmr-tools/src/test/java/"+
-                        "resources/examples/file_formats/bmse000109/1H/acqu").read();
+                System.out.println(PlotFID02.class.getClassLoader().getResource(".").getPath());
+                acquisition = (new AcquReader(PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/acqu"))).read();
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
-            File fidFile = new File("/Users/ldpf/SVN/ldpf/dev/nmr-tools/src/test/java/"+
-                    "resources/examples/file_formats/bmse000109/1H/fid");
+            
+            InputStream fidInput = PlotFID02.class.getResourceAsStream("examples/file_formats/bmse000109/1H/fid");
             Fid fid = null;
             double[] spectrum = null;
-            LdpfsFourierTransformTool ft;
+            FastFourierTransformTool ft;
             try {
-                fid = new FidReader(fidFile, acquisition).read();
-                ft = new LdpfsFourierTransformTool(fid,acquisition);
+                fid = new FidReader(fidInput, acquisition).read();
+                //ft = new LdpfsFourierTransformTool(fid,acquisition);
+                ft = new JTransformFFTTool(fid,acquisition);
+                
 
                 spectrum = ft.computeFFT();
 //                ft.fft(true);
@@ -66,8 +72,7 @@ public class PlotFID02 {
 //            data.add(1, 1); //Point 2
 //            data.add(4, 1); //Point 3
 //            data.add(2, 2); //Point 4
-                dataset.addSeries(data);
-                showGraph();
+                dataset.addSeries(data);                
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }

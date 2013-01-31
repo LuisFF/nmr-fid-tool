@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +20,7 @@ import java.util.regex.Pattern;
  */
 public class AcquReader {
 
-    private static File acquFile;
+    private BufferedReader inputAcqReader;
 
 
     // parameters from acqu
@@ -61,13 +63,17 @@ public class AcquReader {
 
     public AcquReader() {
     }
-
-    public AcquReader(File acquFile) {
-        this.acquFile = acquFile;
+    
+    public AcquReader(File acquFile) throws IOException {
+        inputAcqReader = new BufferedReader(new FileReader(acquFile));        
+    }
+    
+    public AcquReader(InputStream acqFile) {
+        inputAcqReader = new BufferedReader(inputAcqReader);
     }
 
-    public AcquReader(String filename) throws FileNotFoundException {
-        this.acquFile = new File(filename);
+    public AcquReader(String filename) throws IOException {
+        this(new File(filename));
         // required parameters so far...
         // AquiredPoints: FidReader
         // SpectraWidth: FidReader
@@ -78,9 +84,8 @@ public class AcquReader {
     public Acqu read() throws Exception {
         Matcher matcher;
         Acqu acquisition = new Acqu();
-        BufferedReader input = new BufferedReader(new FileReader(acquFile));
-        String line = input.readLine();
-        while (input.ready() && (line != null)) {
+        String line = inputAcqReader.readLine();
+        while (inputAcqReader.ready() && (line != null)) {
             if (REGEXP_SFO1.matcher(line).find()) {
                 matcher = REGEXP_SFO1.matcher(line);
                 matcher.find();
@@ -186,9 +191,9 @@ public class AcquReader {
                 matcher.find();
                 acquisition.setOwner(matcher.group(1));
             }
-            line = input.readLine();
+            line = inputAcqReader.readLine();
         }
-        input.close();
+        inputAcqReader.close();
         return acquisition;
     }
 

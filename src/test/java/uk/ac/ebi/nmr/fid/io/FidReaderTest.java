@@ -24,7 +24,7 @@ public class FidReaderTest {
             Acqu acquisition = new AcquReader("/Users/ldpf/SVN/ldpf/dev/nmr-tools/src/test/java/"+
                     "resources/examples/file_formats/bmse000109/1H/acqu").read();
 
-            Fid fid = new FidReader(fidFile, acquisition).read();
+            //Fid fid = new FidReader(fidFile, acquisition).read();
 
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

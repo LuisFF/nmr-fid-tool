@@ -18,11 +18,6 @@ import org.apache.log4j.Logger;
 public interface FastFourierTransformTool {
 
     double[] computeFFT();
-
-    /**
-     * translating the fft from the cuteNMR...
-     * @return
-     */
-    void fft(boolean isForward);
+    Proc getProcessing();
     
 }

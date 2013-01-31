@@ -6,7 +6,10 @@ import uk.ac.ebi.nmr.fid.Fid;
 import uk.ac.ebi.nmr.fid.LdpfsFourierTransformTool;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +20,7 @@ import java.io.FileNotFoundException;
  */
 public class BrukerReader {
 
-    private File fidFile = null;
+    private String fidFileName = null;
     private File acquFile = null;
     private File procFile = null;
 
@@ -27,7 +30,8 @@ public class BrukerReader {
 
     public BrukerReader(String filename) throws FileNotFoundException {
 
-        this.fidFile = new File(filename);
+        this.fidFileName = filename;
+        File fidFile = new File(this.fidFileName);
         String workingDIR = fidFile.getParent();
         this.acquFile = new File(workingDIR + "/acqu");
         // TODO make other PROC files available
@@ -45,7 +49,7 @@ public class BrukerReader {
         // for the moment set only one processing though it is irrelevant for now
         readPROC(1);
 
-        return new LdpfsFourierTransformTool(new FidReader(fidFile, acquisition).read(), acquisition);
+        return new LdpfsFourierTransformTool(new FidReader(new FileInputStream(fidFileName), acquisition).read(), acquisition);
 
 
     }
