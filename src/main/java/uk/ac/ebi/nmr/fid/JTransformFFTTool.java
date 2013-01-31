@@ -39,7 +39,8 @@ public class JTransformFFTTool extends AbstractFastFourierTransformTool implemen
     private static final Logger LOGGER = Logger.getLogger( JTransformFFTTool.class );
     
     public JTransformFFTTool(Fid fid, Acqu acquisition) throws Exception{                
-        this.processing = new Proc(acquisition);        
+        this.processing = new Proc(acquisition);     
+        this.acquisition = acquisition;
         this.fid = fid;
     }
 
@@ -51,7 +52,7 @@ public class JTransformFFTTool extends AbstractFastFourierTransformTool implemen
 
     @Override
     double[] implementedFFT(double[] apodizedData) {
-        DoubleFFT_1D dfftd = new DoubleFFT_1D(apodizedData.length);
+        DoubleFFT_1D dfftd = new DoubleFFT_1D(apodizedData.length/2);
         dfftd.complexForward(apodizedData);
         return apodizedData;
     }
