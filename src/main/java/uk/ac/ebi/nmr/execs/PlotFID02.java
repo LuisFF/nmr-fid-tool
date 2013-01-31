@@ -12,7 +12,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 import uk.ac.ebi.nmr.fid.Acqu;
 import uk.ac.ebi.nmr.fid.Fid;
-import uk.ac.ebi.nmr.fid.FourierTransformTool;
+import uk.ac.ebi.nmr.fid.LdpfsFourierTransformTool;
 import uk.ac.ebi.nmr.fid.io.AcquReader;
 import uk.ac.ebi.nmr.fid.io.FidReader;
 
@@ -51,12 +51,12 @@ public class PlotFID02 {
                     "resources/examples/file_formats/bmse000109/1H/fid");
             Fid fid = null;
             double[] spectrum = null;
-            FourierTransformTool ft;
+            LdpfsFourierTransformTool ft;
             try {
                 fid = new FidReader(fidFile, acquisition).read();
-                ft = new FourierTransformTool(fid,acquisition);
+                ft = new LdpfsFourierTransformTool(fid,acquisition);
 
-                spectrum = ft.computeFTT();
+                spectrum = ft.computeFFT();
 //                ft.fft(true);
 //                spectrum=ft.getData();
                 for (int i =0 ; i< fid.getData().length; i++){

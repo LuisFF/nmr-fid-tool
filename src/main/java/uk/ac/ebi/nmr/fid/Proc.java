@@ -9,34 +9,34 @@ package uk.ac.ebi.nmr.fid;
  */
 public class Proc {
 
-    private static int windowFunctionType;      //wdw               window function type
-    private static int phasingType;             //ph_mod            phasing type
-    private static int f1DetectionMode;         //mc2               F1 detection mode
-    private static double zeroFrequency;        //sf                frequency of 0 ppm
-    private static double lineBroadning;        //lb                line broadening (in Hz?)
-    private static double gbFactor;             //gb                GB-factor
-    private static double zeroOrderPhase;       //phc0              zero order phase
-    private static double firstOrderPhase;      //phc1              first order phase
-    private static double ssb;                  //ssb               sine bell shift
-    private static double ssbSine;              //ssbSine           sine bell shift
-    private static double ssbSineSquared;       //ssbSineSquared    sine bell shift
+    private int windowFunctionType;      //wdw               window function type
+    private int phasingType;             //ph_mod            phasing type
+    private int f1DetectionMode;         //mc2               F1 detection mode
+    private double zeroFrequency;        //sf                frequency of 0 ppm
+    private double lineBroadning;        //lb                line broadening (in Hz?)
+    private double gbFactor;             //gb                GB-factor
+    private double zeroOrderPhase;       //phc0              zero order phase
+    private double firstOrderPhase;      //phc1              first order phase
+    private double ssb;                  //ssb               sine bell shift
+    private double ssbSine;              //ssbSine           sine bell shift
+    private double ssbSineSquared;       //ssbSineSquared    sine bell shift
 
     // obtained after reading the FID but could it be obtained from the Bruker?
-    private static int transformSize;           //si                transform size (complex)    bruker_read::get_fid
-    private static double dwellTime;            //dw                dwell time (in s)           bruker_read::get_fid
-    private static double hertzPerPoint;        //hzperpt                                       bruker_read::get_fid
-    private static double ppmPerPoint;          //ppmperpt                                      bruker_read::get_fid
-    private static double spectraWidthHertz;    //sw_h                                          bruker_read::get_fid
-    private static double offset;               //offset                                        bruker_read::get_fid
+    private int transformSize;           //si                transform size (complex)    bruker_read::get_fid
+    private double dwellTime;            //dw                dwell time (in s)           bruker_read::get_fid
+    private double hertzPerPoint;        //hzperpt                                       bruker_read::get_fid
+    private double ppmPerPoint;          //ppmperpt                                      bruker_read::get_fid
+    private double spectraWidthHertz;    //sw_h                                          bruker_read::get_fid
+    private double offset;               //offset                                        bruker_read::get_fid
 
     //TODO consider moving this to the Fourier Transformed class or processing class....
     // variables required later...
-    private static int tdEffective;             //td_eff        apodization::transform::do_fft
-    private static int leftShift=0;             //leftshift     ft_settings_dialog::ft_settings_dialog
-    private static int shift;                   //j             apodization::transform::do_fft
-    private static int increment;               //i             apodization::transform::do_fft
+    private int tdEffective;             //td_eff        apodization::transform::do_fft
+    private int leftShift=0;             //leftshift     ft_settings_dialog::ft_settings_dialog
+    private int shift;                   //j             apodization::transform::do_fft
+    private int increment;               //i             apodization::transform::do_fft
 
-    public Proc(Acqu acquisition) throws Exception {
+    public Proc(Acqu acquisition) throws Exception{
 
         // set the size for the fourier Transform
         // perhaps I should check first if I can use the data from the Proc file..??
@@ -80,84 +80,84 @@ public class Proc {
 
     }
 
-    public static int getTransformSize() {
+    public int getTransformSize() {
         return transformSize;
     }
 
-    public static void setTransformSize(int transformSize) {
-        Proc.transformSize = transformSize;
+    public void setTransformSize(int transformSize) {
+        this.transformSize = transformSize;
     }
 
-    public static int getWindowFunctionType() {
+    public int getWindowFunctionType() {
         return windowFunctionType;
     }
 
-    public static void setWindowFunctionType(int windowFunctionType) {
-        Proc.windowFunctionType = windowFunctionType;
+    public void setWindowFunctionType(int windowFunctionType) {
+        this.windowFunctionType = windowFunctionType;
     }
 
-    public static int getPhasingType() {
+    public int getPhasingType() {
         return phasingType;
     }
 
-    public static void setPhasingType(int phasingType) {
-        Proc.phasingType = phasingType;
+    public void setPhasingType(int phasingType) {
+        this.phasingType = phasingType;
     }
 
-    public static int getF1DetectionMode() {
+    public int getF1DetectionMode() {
         return f1DetectionMode;
     }
 
-    public static void setF1DetectionMode(int f1DetectionMode) {
-        Proc.f1DetectionMode = f1DetectionMode;
+    public void setF1DetectionMode(int f1DetectionMode) {
+        this.f1DetectionMode = f1DetectionMode;
     }
 
-    public static double getZeroFrequency() {
+    public double getZeroFrequency() {
         return zeroFrequency;
     }
 
-    public static void setZeroFrequency(double zeroFrequency) {
-        Proc.zeroFrequency = zeroFrequency;
+    public void setZeroFrequency(double zeroFrequency) {
+        this.zeroFrequency = zeroFrequency;
     }
 
-    public static double getLineBroadning() {
+    public double getLineBroadning() {
         return lineBroadning;
     }
 
-    public static void setLineBroadning(double lineBroadning) {
-        Proc.lineBroadning = lineBroadning;
+    public void setLineBroadning(double lineBroadning) {
+        this.lineBroadning = lineBroadning;
     }
 
-    public static double getGbFactor() {
+    public double getGbFactor() {
         return gbFactor;
     }
 
-    public static void setGbFactor(double gbFactor) {
-        Proc.gbFactor = gbFactor;
+    public void setGbFactor(double gbFactor) {
+        this.gbFactor = gbFactor;
     }
 
-    public static double getZeroOrderPhase() {
+    public double getZeroOrderPhase() {
         return zeroOrderPhase;
     }
 
-    public static void setZeroOrderPhase(double zeroOrderPhase) {
-        Proc.zeroOrderPhase = zeroOrderPhase;
+    public void setZeroOrderPhase(double zeroOrderPhase) {
+        this.zeroOrderPhase = zeroOrderPhase;
     }
 
-    public static double getFirstOrderPhase() {
+    public double getFirstOrderPhase() {
         return firstOrderPhase;
     }
 
-    public static void setFirstOrderPhase(double firstOrderPhase) {
-        Proc.firstOrderPhase = firstOrderPhase;
+    public void setFirstOrderPhase(double firstOrderPhase) {
+        this.firstOrderPhase = firstOrderPhase;
     }
 
-    public static double getSsb() {
+    public double getSsb() {
         return ssb;
     }
 
-    public static void setSsb(double ssb) {
-        Proc.ssb = ssb;
+    public void setSsb(double ssb) {
+        this.ssb = ssb;
         // if ssb is given in degrees this converts it to the inverse of coefficient in front to the Pi
         // 360 = 2 Pi => angle/180 = coefficient (e.g. 360/180 = 2 Pi)
         // This variables are used in the apodizationTool method sine and Co.
@@ -166,51 +166,51 @@ public class Proc {
         else
               ssb = 0.0;
         // I do not get this... (see source code)
-        Proc.ssbSine = ssb;
-        Proc.ssbSineSquared = ssb;
+        this.ssbSine = ssb;
+        this.ssbSineSquared = ssb;
     }
 
-    public static double getSsbSine() {
+    public double getSsbSine() {
         return ssbSine;
     }
 
-    public static double getSsbSineSquared() {
+    public double getSsbSineSquared() {
         return ssbSineSquared;
     }
 
-    public static int getTdEffective() {
+    public int getTdEffective() {
         return tdEffective;
     }
 
-    public static void setTdEffective(int tdEffective) {
-        Proc.tdEffective = tdEffective;
+    public void setTdEffective(int tdEffective) {
+        this.tdEffective = tdEffective;
     }
 
-    public static int getLeftShift() {
+    public int getLeftShift() {
         return leftShift;
     }
 
-    public static void setLeftShift(int leftShift) {
-        Proc.leftShift = leftShift;
+    public void setLeftShift(int leftShift) {
+        this.leftShift = leftShift;
     }
 
-    public static int getShift() {
+    public int getShift() {
         return shift;
     }
 
-    public static void setShift(int shift) {
-        Proc.shift = shift;
+    public void setShift(int shift) {
+        this.shift = shift;
     }
 
-    public static int getIncrement() {
+    public int getIncrement() {
         return increment;
     }
 
-    public static void setIncrement(int increment) {
-        Proc.increment = increment;
+    public void setIncrement(int increment) {
+        this.increment = increment;
     }
 
-    public static double getDwellTime() {
+    public double getDwellTime() {
         return dwellTime;
     }
 }

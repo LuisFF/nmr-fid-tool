@@ -32,7 +32,7 @@ public class ApodizationTool {
         this.acquisitionMode=acquisitionMode;
     }
 
-    public static double[] getSpectrum() {
+    public double[] getSpectrum() {
         return spectrum;
     }
 

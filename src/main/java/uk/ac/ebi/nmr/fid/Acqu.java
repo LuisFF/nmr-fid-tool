@@ -11,28 +11,28 @@ public class Acqu {
 
 
     //TODO use an enum for parameters that have a limited set of options such as aquisition mode
-    private static double transmiterFreq;               //sfo1
-    private static double decoupler1Freq;               //sfo2
-    private static double decoupler2Feq;                //sfo3
-    private static double freqOffset;                   //o1 (Hz)
-    private static double spectralWidth;                //sw            (ppm)
-    private static int aquiredPoints;                   //td            acquired points (real + imaginary)
-    private static int dspDecimation;                   //decim         DSP decimation factor
-    private static int dspFirmware;                     //dspfvs        DSP firmware version
-    private static int dspGroupDelay;                   //grpdly        DSP group delay
-    private static int byteOrder;                       //bytorda       byte order
-    private static int filterType;                      //digmod        filter type
-    private static int numberOfScans;                   //ns            number of scans
-    private static boolean integerType;                 //dtypa         data type (0 -> 32 bit int, 1 -> 64 bit double)
-    private static String pulseProgram;                 //pulprog       pulse program
-    private static String observedNucleus;              //nuc1          observed nucleus
-    private static String instrumentName;               //instrum       instrument name
-    private static String solvent;                      //solvent       solvent
-    private static String probehead;                    //probehead     probehead
-    private static String origin;                       //origin        origin
-    private static String owner;                        //owner         owner
-    private static AcquisitionMode acquisitionMode;      //aq_mod        acquisition mode
-    private static FidData fidType;                     //fid_type      define in class data_par
+    private double transmiterFreq;               //sfo1
+    private double decoupler1Freq;               //sfo2
+    private double decoupler2Feq;                //sfo3
+    private double freqOffset;                   //o1 (Hz)
+    private double spectralWidth;                //sw            (ppm)
+    private int aquiredPoints;                   //td            acquired points (real + imaginary)
+    private int dspDecimation;                   //decim         DSP decimation factor
+    private int dspFirmware;                     //dspfvs        DSP firmware version
+    private int dspGroupDelay;                   //grpdly        DSP group delay
+    private int byteOrder;                       //bytorda       byte order
+    private int filterType;                      //digmod        filter type
+    private int numberOfScans;                   //ns            number of scans
+    private boolean integerType;                 //dtypa         data type (0 -> 32 bit int, 1 -> 64 bit double)
+    private String pulseProgram;                 //pulprog       pulse program
+    private String observedNucleus;              //nuc1          observed nucleus
+    private String instrumentName;               //instrum       instrument name
+    private String solvent;                      //solvent       solvent
+    private String probehead;                    //probehead     probehead
+    private String origin;                       //origin        origin
+    private String owner;                        //owner         owner
+    private AcquisitionMode acquisitionMode;      //aq_mod        acquisition mode
+    private FidData fidType;                     //fid_type      define in class data_par
 
 
 
@@ -40,182 +40,182 @@ public class Acqu {
 
     }
 
-    public static double getTransmiterFreq() {
+    public double getTransmiterFreq() {
         return transmiterFreq;
     }
 
-    public static void setTransmiterFreq(double transmiterFreq) {
-        Acqu.transmiterFreq = transmiterFreq;
+    public void setTransmiterFreq(double transmiterFreq) {
+        this.transmiterFreq = transmiterFreq;
     }
 
-    public static double getDecoupler1Freq() {
+    public double getDecoupler1Freq() {
         return decoupler1Freq;
     }
 
-    public static void setDecoupler1Freq(double decoupler1Freq) {
-        Acqu.decoupler1Freq = decoupler1Freq;
+    public void setDecoupler1Freq(double decoupler1Freq) {
+        this.decoupler1Freq = decoupler1Freq;
     }
 
-    public static double getDecoupler2Feq() {
+    public double getDecoupler2Feq() {
         return decoupler2Feq;
     }
 
-    public static void setDecoupler2Feq(double decoupler2Feq) {
-        Acqu.decoupler2Feq = decoupler2Feq;
+    public void setDecoupler2Feq(double decoupler2Feq) {
+        this.decoupler2Feq = decoupler2Feq;
     }
 
-    public static double getFreqOffset() {
+    public double getFreqOffset() {
         return freqOffset;
     }
 
-    public static void setFreqOffset(double freqOffset) {
-        Acqu.freqOffset = freqOffset;
+    public void setFreqOffset(double freqOffset) {
+        this.freqOffset = freqOffset;
     }
 
-    public static double getSpectralWidth() {
+    public double getSpectralWidth() {
         return spectralWidth;
     }
 
-    public static void setSpectralWidth(double spectralWidth) {
-        Acqu.spectralWidth = spectralWidth;
+    public void setSpectralWidth(double spectralWidth) {
+        this.spectralWidth = spectralWidth;
     }
 
-    public static int getAquiredPoints() {
+    public int getAquiredPoints() {
         return aquiredPoints;
     }
 
-    public static void setAquiredPoints(int aquiredPoints) {
-        Acqu.aquiredPoints = aquiredPoints;
+    public void setAquiredPoints(int aquiredPoints) {
+        this.aquiredPoints = aquiredPoints;
     }
 
-    public static int getDspDecimation() {
+    public int getDspDecimation() {
         return dspDecimation;
     }
 
-    public static void setDspDecimation(int dspDecimation) {
-        Acqu.dspDecimation = dspDecimation;
+    public void setDspDecimation(int dspDecimation) {
+        this.dspDecimation = dspDecimation;
     }
 
-    public static int getDspFirmware() {
+    public int getDspFirmware() {
         return dspFirmware;
     }
 
-    public static void setDspFirmware(int dspFirmware) {
-        Acqu.dspFirmware = dspFirmware;
+    public void setDspFirmware(int dspFirmware) {
+        this.dspFirmware = dspFirmware;
     }
 
-    public static int getDspGroupDelay() {
+    public int getDspGroupDelay() {
         return dspGroupDelay;
     }
 
-    public static void setDspGroupDelay(int dspGroupDelay) {
-        Acqu.dspGroupDelay = dspGroupDelay;
+    public void setDspGroupDelay(int dspGroupDelay) {
+        this.dspGroupDelay = dspGroupDelay;
     }
 
-    public static int getByteOrder() {
+    public int getByteOrder() {
         return byteOrder;
     }
 
-    public static void setByteOrder(int byteOrder) {
-        Acqu.byteOrder = byteOrder;
+    public void setByteOrder(int byteOrder) {
+        this.byteOrder = byteOrder;
     }
 
-    public static AcquisitionMode getAcquisitionMode() {
+    public AcquisitionMode getAcquisitionMode() {
         return acquisitionMode;
     }
 
-    public static void setAcquisitionMode(int acquisitionMode) {
+    public void setAcquisitionMode(int acquisitionMode) {
         for (AcquisitionMode mode : AcquisitionMode.values())
             if (mode.type == acquisitionMode)
-                Acqu.acquisitionMode = mode;
+                this.acquisitionMode = mode;
     }
-    public static void setAcquisitionMode(AcquisitionMode mode) {
-        Acqu.acquisitionMode=mode;
+    public void setAcquisitionMode(AcquisitionMode mode) {
+        this.acquisitionMode=mode;
 
     }
 
-    public static int getFilterType() {
+    public int getFilterType() {
         return filterType;
     }
 
-    public static void setFilterType(int filterType) {
-        Acqu.filterType = filterType;
+    public void setFilterType(int filterType) {
+        this.filterType = filterType;
     }
 
-    public static int getNumberOfScans() {
+    public int getNumberOfScans() {
         return numberOfScans;
     }
 
-    public static void setNumberOfScans(int numberOfScans) {
-        Acqu.numberOfScans = numberOfScans;
+    public void setNumberOfScans(int numberOfScans) {
+        this.numberOfScans = numberOfScans;
     }
 
-    public static String getPulseProgram() {
+    public String getPulseProgram() {
         return pulseProgram;
     }
 
-    public static void setPulseProgram(String pulseProgram) {
-        Acqu.pulseProgram = pulseProgram;
+    public void setPulseProgram(String pulseProgram) {
+        this.pulseProgram = pulseProgram;
     }
 
-    public static String getObservedNucleus() {
+    public String getObservedNucleus() {
         return observedNucleus;
     }
 
-    public static void setObservedNucleus(String observedNucleus) {
-        Acqu.observedNucleus = observedNucleus;
+    public void setObservedNucleus(String observedNucleus) {
+        this.observedNucleus = observedNucleus;
     }
 
-    public static String getInstrumentName() {
+    public String getInstrumentName() {
         return instrumentName;
     }
 
-    public static void setInstrumentName(String instrumentName) {
-        Acqu.instrumentName = instrumentName;
+    public void setInstrumentName(String instrumentName) {
+        this.instrumentName = instrumentName;
     }
 
-    public static boolean is32Bit() {
+    public boolean is32Bit() {
         return integerType;
     }
 
-    public static void set32Bit(boolean is32Bit) {
+    public void set32Bit(boolean is32Bit) {
         fidType=(is32Bit)?FidData.INT32:FidData.DOUBLE;
-        Acqu.integerType = is32Bit;
+        this.integerType = is32Bit;
     }
 
-    public static String getSolvent() {
+    public String getSolvent() {
         return solvent;
     }
 
-    public static void setSolvent(String solvent) {
-        Acqu.solvent = solvent;
+    public void setSolvent(String solvent) {
+        this.solvent = solvent;
     }
 
-    public static String getProbehead() {
+    public String getProbehead() {
         return probehead;
     }
 
-    public static void setProbehead(String probehead) {
-        Acqu.probehead = probehead;
+    public void setProbehead(String probehead) {
+        this.probehead = probehead;
     }
 
-    public static String getOrigin() {
+    public String getOrigin() {
         return origin;
     }
 
-    public static void setOrigin(String origin) {
-        Acqu.origin = origin;
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
-    public static String getOwner() {
+    public String getOwner() {
         return owner;
     }
 
-    public static void setOwner(String owner) {
-        Acqu.owner = owner;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
-    public static FidData getFidType() {
+    public FidData getFidType() {
         return fidType;
     }
 

@@ -106,8 +106,8 @@
         <dependency>
             <groupId>org.openscience.cdk</groupId>
             <artifactId>cdk-extra</artifactId>
-            <version>1.5.0-aromatic-equiv</version>
-            <!--<version>${cdk.version}</version>-->
+            <!-- <version>1.5.0-aromatic-equiv</version> -->
+            <version>${cdk.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -188,12 +188,13 @@
         <dependency>
             <groupId>org.openscience.cdk</groupId>
             <artifactId>cdk-structgen</artifactId>
-            <version>1.5.0-master</version>
+            <version>${cdk.version}</version>
+            <!-- <version>1.5.0-master</version> -->
         </dependency>
         <dependency>
             <groupId>signatures</groupId>
             <artifactId>signatures</artifactId>
-            <version>1.0</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>gov.nist.math</groupId>

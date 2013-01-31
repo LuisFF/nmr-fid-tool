@@ -9,38 +9,32 @@ import uk.ac.ebi.nmr.fid.tools.ApodizationTool;
  * Time: 14:02
  * To change this template use File | Settings | File Templates.
  */
-public class FourierTransformTool {
+public class LdpfsFourierTransformTool implements FastFourierTransformTool {
 
-    private static Acqu acquisition;
-    private static Proc processing;
-    private static Fid fid;
+    Acqu acquisition;
+    Proc processing;
+    Fid fid;
 
-    private static double[] data;               //proc_buffer   apodization::transform::do_fft
-
-
+    double[] data;               //proc_buffer   apodization::transform::do_fft
 
 
 
 
-    public FourierTransformTool() {
+
+
+    public LdpfsFourierTransformTool() {
     }
 
-    public FourierTransformTool(Fid fid, Acqu acquisition) {
-        Proc processing = null;
-        try {
-            processing = new Proc(acquisition);
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        new FourierTransformTool(fid, acquisition, processing);
-
+    public LdpfsFourierTransformTool(Fid fid, Acqu acquisition) throws Exception{                
+        this.processing = new Proc(acquisition);        
+        this.fid = fid;
     }
 
-    public FourierTransformTool(Fid fid, Acqu acquisition, Proc processing) {
+    public LdpfsFourierTransformTool(Fid fid, Acqu acquisition, Proc processing) {
 
         this.fid=fid;
         this.acquisition=acquisition;
-        this.processing= processing;
+        this.processing=processing;
 
         // instanciating the array where the fourier transformed spectra will be stored....
         switch (acquisition.getAcquisitionMode()) {
@@ -107,7 +101,8 @@ public class FourierTransformTool {
 
     }
 
-    public double [] computeFTT(){
+    @Override
+    public double [] computeFFT(){
         int signals;
         processing.setLineBroadning(0.3);
         /// applyWindowFunctions //window function need to be applied before FT
@@ -150,6 +145,7 @@ public class FourierTransformTool {
      * @return
      */
 
+    @Override
     public void fft(boolean isForward) {
         int j =1;
         int numberOfPairs=2*processing.getTransformSize();
@@ -224,28 +220,28 @@ public class FourierTransformTool {
     }
 
 
-    public static Acqu getAcquisition() {
+    public Acqu getAcquisition() {
         return acquisition;
     }
 
-    public static Proc getProcessing() {
+    public Proc getProcessing() {
         return processing;
     }
 
-    public static Fid getFid() {
+    public Fid getFid() {
         return fid;
     }
 
-    public static double[] getData() {
+    public double[] getData() {
         return data;
     }
 
-    public static void setData(double[] data) {
-        FourierTransformTool.data = data;
+    public void setData(double[] data) {
+        this.data = data;
     }
 
-    public static void setData(int index, double point) {
-        FourierTransformTool.data[index] = point;
+    public void setData(int index, double point) {
+        this.data[index] = point;
     }
 
 

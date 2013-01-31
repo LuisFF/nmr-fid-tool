@@ -3,7 +3,7 @@ package uk.ac.ebi.nmr.fid.io;
 
 import uk.ac.ebi.nmr.fid.Acqu;
 import uk.ac.ebi.nmr.fid.Fid;
-import uk.ac.ebi.nmr.fid.FourierTransformTool;
+import uk.ac.ebi.nmr.fid.LdpfsFourierTransformTool;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,7 +36,7 @@ public class BrukerReader {
     }
 
 
-    public FourierTransformTool read() throws Exception {
+    public LdpfsFourierTransformTool read() throws Exception {
 
         Acqu acquisition = null;
         Fid fid = null;
@@ -45,7 +45,7 @@ public class BrukerReader {
         // for the moment set only one processing though it is irrelevant for now
         readPROC(1);
 
-        return new FourierTransformTool(new FidReader(fidFile, acquisition).read(), acquisition);
+        return new LdpfsFourierTransformTool(new FidReader(fidFile, acquisition).read(), acquisition);
 
 
     }
