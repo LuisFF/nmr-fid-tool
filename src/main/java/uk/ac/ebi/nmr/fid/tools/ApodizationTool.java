@@ -75,14 +75,14 @@ public class ApodizationTool {
         double data[] = new double[processing.getTdEffective()];
         if (acquisitionMode.equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
             for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i++)
-//                spectrum[i]*= Math.exp(-i*processing.getDwellTime()*Math.PI*processing.getLineBroadning());
-                data[i] = spectrum[i]* Math.exp(-i*processing.getDwellTime()*processing.getLineBroadning());
+                data[i]*= Math.exp(-i*processing.getDwellTime()*Math.PI*processing.getLineBroadning());
+//                data[i] = spectrum[i]* Math.exp(-i*processing.getDwellTime()*processing.getLineBroadning());
         } else { // simultaneous data
-            for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i+=2){
-//                double factor = Math.exp(-i*processing.getDwellTime()*Math.PI*processing.getLineBroadning());
-                double factor = Math.exp(-i*processing.getDwellTime()*processing.getLineBroadning());
+            for (int i =0 ; i< processing.getTdEffective()-1 && i < spectrum.length; i+=2){
+                double factor = Math.exp(-i*processing.getDwellTime()*Math.PI*processing.getLineBroadning());
+//                double factor = Math.exp(-i*processing.getDwellTime()*processing.getLineBroadning());
                 data[i]= spectrum[i]* factor;
-                data[i+1] =spectrum[i+1]* factor;
+                data[i+1]=spectrum[i+1]* factor;
 //                spectrum[i+1]*= Math.exp(-i*processing.getDwellTime()*Math.PI*processing.getLineBroadning());
             }
         }
@@ -94,8 +94,8 @@ public class ApodizationTool {
         lorentzGaus(0);
     }
 
-    public void lorentzGaus(double lbLorentzToGauss){
-
+    public double[] lorentzGaus(double lbLorentzToGauss){
+        double [] data = new double[processing.getTdEffective()];
         double acquisitionTime = processing.getDwellTime()*processing.getTdEffective();
         double a = Math.PI*lbLorentzToGauss;
         double b = -a/(2.0*processing.getGbFactor()*acquisitionTime);
@@ -104,23 +104,24 @@ public class ApodizationTool {
         if (acquisitionMode.equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
             for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i++){
                 time=i*processing.getDwellTime();
-                spectrum[i]*=Math.exp(-a*time -b*time*time);
+                data[i]=spectrum[i]*Math.exp(-a*time -b*time*time);
             }
         } else {
             for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i+=2){
                 time=i*processing.getDwellTime();
-                spectrum[i]*= Math.exp(-a*time -b*time*time);
-                spectrum[i+1]*= Math.exp(-a*time -b*time*time);
+                data[i]= spectrum[i] * Math.exp(-a*time -b*time*time);
+                data[i+1]= spectrum[i+1]* Math.exp(-a*time -b*time*time);
             }
         }
-
+        return data;
     }
 
-    public void tarf(){
-        traf(0);
+    public double[] tarf(){
+        return traf(0);
     }
 
-    public void traf(double lbTraf){
+    public double[] traf(double lbTraf){
+        double [] data = new double[processing.getTdEffective()];
         double acquisitionTime = processing.getDwellTime()*processing.getTdEffective();
         double time, e , eps;
 
@@ -129,25 +130,27 @@ public class ApodizationTool {
                 time=i*processing.getDwellTime();
                 e = Math.exp(-time*lbTraf*Math.PI);
                 eps = Math.exp((time-acquisitionTime) * lbTraf * Math.PI);
-                spectrum[i]*=e/(e*e+eps*eps);
+                data[i] = spectrum[i] * e/(e*e+eps*eps);
             }
         } else {
             for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i+=2){
                 time=i*processing.getDwellTime();
                 e = Math.exp(-time*lbTraf*Math.PI);
                 eps = Math.exp((time-acquisitionTime) * lbTraf * Math.PI);
-                spectrum[i]*=e/(e*e+eps*eps);
-                spectrum[i+1]*=e/(e*e+eps*eps);
+                data[i]=spectrum[i]*e/(e*e+eps*eps);
+                data[i+1]=spectrum[i+1]*e/(e*e+eps*eps);
 
             }
         }
+        return data;
     }
 
-    public void trafs (){
-        trafs(0);
+    public double[] trafs (){
+        return trafs(0);
     }
 
-    public void trafs (double lbTraf){
+    public double[] trafs (double lbTraf){
+        double [] data = new double[processing.getTdEffective()];
         double acquisitionTime = processing.getDwellTime()*processing.getTdEffective();
         double time, e , eps;
 
@@ -156,20 +159,22 @@ public class ApodizationTool {
                 time=i*processing.getDwellTime();
                 e = Math.exp(-time*lbTraf*Math.PI);
                 eps = Math.exp((time-acquisitionTime) * lbTraf * Math.PI);
-                spectrum[i]*=(e*e*(e+eps))/(e*e*e+eps*eps*eps);
+                data[i]=spectrum[i]*(e*e*(e+eps))/(e*e*e+eps*eps*eps);
             }
         } else {
             for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i+=2){
                 time=i*processing.getDwellTime();
                 e = Math.exp(-time*lbTraf*Math.PI);
                 eps = Math.exp((time-acquisitionTime) * lbTraf * Math.PI);
-                spectrum[i]*=(e*e*(e+eps))/(e*e*e+eps*eps*eps);
-                spectrum[i+1]*=(e*e*(e+eps))/(e*e*e+eps*eps*eps);
+                data[i]=spectrum[i]*(e*e*(e+eps))/(e*e*e+eps*eps*eps);
+                data[i]=spectrum[i+1]*(e*e*(e+eps))/(e*e*e+eps*eps*eps);
             }
         }
+        return data;
     }
 
-    public void sine() {
+    public double [] sine() {
+        double [] data = new double[processing.getTdEffective()];
         double factor;
         // ssbSine is defined as 180/ssb
         //
@@ -179,12 +184,14 @@ public class ApodizationTool {
                 i< (processing.getTdEffective()-1) && i >= ((processing.getTdEffective()-1)-spectrum.length) ;
                 i+=2){
             factor=Math.sin(i/processing.getTdEffective()*Math.PI*offset);
-            spectrum[processing.getTdEffective()-1 -i]*=factor;
-            spectrum[processing.getTdEffective()-2 -i]*=factor;
+            data[processing.getTdEffective()-1 -i]=spectrum[processing.getTdEffective()-1 -i]*factor;
+            data[processing.getTdEffective()-2 -i]=spectrum[processing.getTdEffective()-2 -i]*factor;
         }
+        return data;
     }
 
-    public void sineSquared() {
+    public double [] sineSquared() {
+        double [] data = new double[processing.getTdEffective()];
         double factor;
         double offset = (180.0 - processing.getSsbSineSquared())/180.0;
         // check the loop conditions in the original code...
@@ -192,9 +199,10 @@ public class ApodizationTool {
                 i< (processing.getTdEffective()-1) && i >= ((processing.getTdEffective()-1)-spectrum.length) ;
                 i+=2){
             factor=Math.pow(Math.sin(i/processing.getTdEffective()*Math.PI*offset),2);
-            spectrum[processing.getTdEffective()-1 -i]*=factor;
-            spectrum[processing.getTdEffective()-2 -i]*=factor;
+            data[processing.getTdEffective()-1 -i]=spectrum[processing.getTdEffective()-1 -i]*factor;
+            data[processing.getTdEffective()-2 -i]=spectrum[processing.getTdEffective()-2 -i]*factor;
         }
+        return data;
     }
 
     /**
@@ -264,7 +272,7 @@ public class ApodizationTool {
             for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i+=2){
                 time=i*processing.getDwellTime();
                 double factor=Math.exp(-Math.pow(time*lbGauss,2));
-                data[i]=spectrum[i]*=factor;
+                data[i]=spectrum[i]*factor;
                 data[i+1]=spectrum[i+1]*factor;
             }
         }
@@ -289,17 +297,17 @@ public class ApodizationTool {
      * This operation adds a determined set of zeros to the fid tail.
      * @param numberZeros
      */
-    private void zeroFill(int numberZeros) {
-        double[] tmp;
+    private double[] zeroFill(int numberZeros) {
+        double[] data;
         //TODO Check if the sequencial and simultaneous stuff is right...
         if (acquisitionMode.equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
-            tmp= new double[spectrum.length+numberZeros];
+            data= new double[spectrum.length+numberZeros];
         }   else {
-            tmp= new double[spectrum.length+numberZeros*2];
+            data= new double[spectrum.length+numberZeros*2];
         }
-        System.arraycopy(spectrum, 0, tmp, 0, spectrum.length);
-        for (int i=spectrum.length; i < tmp.length; i++)
-            tmp[i]=0;
-        spectrum=tmp;
+        System.arraycopy(spectrum, 0, data, 0, spectrum.length);
+        for (int i=spectrum.length; i < data.length; i++)
+            data[i]=0;
+        return data;
     }
 }
