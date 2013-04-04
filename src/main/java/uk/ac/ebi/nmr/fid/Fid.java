@@ -1,5 +1,7 @@
 package uk.ac.ebi.nmr.fid;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.List;
 
 /**
@@ -15,16 +17,27 @@ public class Fid {
     private int[] imaginary;
 
     public Fid(List<Integer> fid) {
-        data=new int[fid.size()];
-        real=new int[fid.size()/2];
-        imaginary=new int[fid.size()/2];
+        this(ArrayUtils.toPrimitive(fid.toArray(new Integer[fid.size()])));
+    }
 
-        for(int i=0; i < fid.size(); i++){
-            data[i]=fid.get(i);
-            if(i % 2 == 0)
-                real[i/2]=data[i];
-            else
-                imaginary[(i-1)/2]=data[i];
+    public Fid(float [] fid) {
+        int[]  fidInt = new int[fid.length];
+        for(int i = 0 ; i< fid.length; i++){
+            fidInt[i]=(int) Math.round(fid[i]);
+        }
+        new Fid(fidInt);
+
+    }
+
+    public Fid(int [] fid) {
+        data = fid ;
+
+        real=new int[fid.length/2];
+        imaginary=new int[fid.length/2];
+
+        for(int i=0; i < fid.length; i+=2){
+            real[i/2]=data[i];// real are in even positions
+            imaginary[i/2]=data[i+1];// imaginary are in odd positions
         }
     }
 
