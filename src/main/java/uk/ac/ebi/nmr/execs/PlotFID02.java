@@ -21,7 +21,8 @@ import uk.ac.ebi.nmr.fid.FastFourierTransformTool;
 import uk.ac.ebi.nmr.fid.Fid;
 import uk.ac.ebi.nmr.fid.JTransformFFTTool;
 import uk.ac.ebi.nmr.fid.Proc;
-import uk.ac.ebi.nmr.fid.io.AcquReader;
+import uk.ac.ebi.nmr.fid.io.BrukerAcquReader;
+import uk.ac.ebi.nmr.fid.io.ConnjurFidReader;
 import uk.ac.ebi.nmr.fid.io.FidReader;
 import uk.ac.ebi.nmr.fid.tools.PhaseCorrectionTool;
 
@@ -57,10 +58,10 @@ public class PlotFID02 {
         final XYSeries data = new XYSeries("data");
         BrukerDataSetReader dataSetReader = new BrukerDataSetReader();
 
-//        dataSetReader.setDataSource(new File("/Users/ldpf/SVN/ldpf/dev/nmr-tools/src/test/java/" +
-//                "resources/examples/file_formats/bmse000109/1H/"));
+        dataSetReader.setDataSource(new File("/Users/ldpf/SVN/ldpf/dev/nmr-tools/src/test/java/" +
+                "resources/examples/file_formats/bmse000109/1H/"));
 //        dataSetReader.setDataSource(new File("/Users/ldpf/Data/Databases/bmrb/tar_01/4_aminobenzoic_acid/nmr/bmse000066/1H/"));
-        dataSetReader.setDataSource(new File("/Users/ldpf/Data/EIPOD/nmr/purecompound-201204-05/nmr/lf_gliotoxin_600/1/"));
+//        dataSetReader.setDataSource(new File("/Users/ldpf/Data/EIPOD/nmr/purecompound-201204-05/nmr/lf_gliotoxin_600/1/"));
 
 
         DataControl dataControl = new DataControl();
@@ -98,9 +99,9 @@ public class PlotFID02 {
             acquisition.setTransmiterFreq(500); // for bmse000109 is app. 500
             acquisition.setSpectralWidth(13); // for bmse000109 is app. 13
             Proc processing = new Proc(acquisition);
-            processing.setLineBroadning(1);
+            processing.setLineBroadening(1);
             System.out.println("DW: " +processing.getDwellTime());
-            System.out.println("LB: " +processing.getLineBroadning());
+            System.out.println("LB: " +processing.getLineBroadening());
 
 
             int offSet = 141; // number of points ignored in the left side of the fid
@@ -114,6 +115,8 @@ public class PlotFID02 {
                 fidTransformed[(i-141)*2]=fidReal.getValue(i);// insert the real (odd entries)
                 fidTransformed[(i-141)*2+1]=fidIm.getValue(i);// insert the imaginary (even entries)
             }
+
+
             FloatFFT_1D fftd = new FloatFFT_1D(fidReal.getValues().length-141);
 
             fftd.complexInverse(fidTransformed, true);
@@ -184,11 +187,13 @@ public class PlotFID02 {
     private void initialApproach() throws Exception {
 
         final XYSeries data = new XYSeries("data");
-        Acqu acquisition = (new AcquReader(PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/acqu"))).read();
+        Acqu acquisition = (new BrukerAcquReader(PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/acqu"))).read();
         InputStream fidInput = PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/fid");
         FastFourierTransformTool ft;
-
-        Fid fid = new FidReader(fidInput, acquisition).read();
+        FidReader fidReader = new ConnjurFidReader(new File("/Users/ldpf/SVN/ldpf/dev/nmr-tools/src/test/java/"+
+                "resources/examples/file_formats/bmse000109/1H/"));
+//        Fid fid = new FidReader(fidInput, acquisition).read();
+        Fid fid = fidReader.read();
         System.out.println("numeber of points: " + fid.getData().length);
 
         ft = new JTransformFFTTool(fid, acquisition);

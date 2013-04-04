@@ -38,7 +38,7 @@ public class Proc {
     private int phasingType;             //ph_mod            phasing type
     private int f1DetectionMode;         //mc2               F1 detection mode
     private double zeroFrequency;        //sf                frequency of 0 ppm
-    private double lineBroadning;        //lb                line broadening (in Hz?)
+    private double lineBroadening;       //lb                line broadening (in Hz?)
     private double gbFactor;             //gb                GB-factor
     private double zeroOrderPhase;       //phc0              zero order phase
     private double firstOrderPhase;      //phc1              first order phase
@@ -145,12 +145,12 @@ public class Proc {
         this.zeroFrequency = zeroFrequency;
     }
 
-    public double getLineBroadning() {
-        return lineBroadning;
+    public double getLineBroadening() {
+        return lineBroadening;
     }
 
-    public void setLineBroadning(double lineBroadning) {
-        this.lineBroadning = lineBroadning;
+    public void setLineBroadening(double lineBroadening) {
+        this.lineBroadening = lineBroadening;
     }
 
     public double getGbFactor() {

@@ -1,7 +1,5 @@
 package uk.ac.ebi.nmr.fid;
 
-import uk.ac.ebi.nmr.fid.tools.ApodizationTool;
-
 /**
  * Created with IntelliJ IDEA.
  * User: ldpf

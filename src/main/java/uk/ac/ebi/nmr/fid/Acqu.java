@@ -15,11 +15,12 @@ public class Acqu {
     private double decoupler1Freq;               //sfo2
     private double decoupler2Feq;                //sfo3
     private double freqOffset;                   //o1 (Hz)
-    private double spectralWidth;                //sw            (ppm)
+    private double spectralFrequency;            //BF1 (Hz)
+    private double spectralWidth;                //sw            sweep width (ppm)
     private int aquiredPoints;                   //td            acquired points (real + imaginary)
     private int dspDecimation;                   //decim         DSP decimation factor
     private int dspFirmware;                     //dspfvs        DSP firmware version
-    private int dspGroupDelay;                   //grpdly        DSP group delay
+    private double dspGroupDelay;                //grpdly        DSP group delay
     private int byteOrder;                       //bytorda       byte order
     private int filterType;                      //digmod        filter type
     private int numberOfScans;                   //ns            number of scans
@@ -104,11 +105,11 @@ public class Acqu {
         this.dspFirmware = dspFirmware;
     }
 
-    public int getDspGroupDelay() {
+    public double getDspGroupDelay() {
         return dspGroupDelay;
     }
 
-    public void setDspGroupDelay(int dspGroupDelay) {
+    public void setDspGroupDelay(double dspGroupDelay) {
         this.dspGroupDelay = dspGroupDelay;
     }
 
@@ -246,5 +247,13 @@ public class Acqu {
         }
 
         private double getType(){return type;};
+    }
+
+    public double getSpectralFrequency() {
+        return spectralFrequency;
+    }
+
+    public void setSpectralFrequency(double spectralFrequency) {
+        this.spectralFrequency = spectralFrequency;
     }
 }

@@ -22,8 +22,8 @@
 package uk.ac.ebi.nmr.fid;
 
 
-import org.apache.log4j.Logger;
-import uk.ac.ebi.nmr.fid.tools.ApodizationTool;
+import uk.ac.ebi.nmr.fid.tools.apodization.Apodizator;
+import uk.ac.ebi.nmr.fid.tools.apodization.ExponentialApodizator;
 
 /**
  * @name    AbstractFastFourierTransformTool
@@ -61,12 +61,16 @@ public abstract class AbstractFastFourierTransformTool {
         applyRedfieldOnSequentialData(acquisition, processing);
         tdRelatedNonUnderstoodRearrangementForSequential(processing, acquisition);
         int signals;
-        processing.setLineBroadning(0.3);
+        processing.setLineBroadening(0.3);
         /// applyWindowFunctions //window function need to be applied before FT
-        ApodizationTool apodization = new ApodizationTool(data, acquisition.getAcquisitionMode(), processing);
+        Apodizator apodization = new ExponentialApodizator(data, acquisition.getAcquisitionMode(), processing);
         double[] apodizedData = null;
-        apodization.exponential();
-        apodizedData = apodization.getSpectrum();
+
+        try {
+            apodizedData = apodization.calculate();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         return implementedFFT(apodizedData);
     }
     

@@ -6,10 +6,7 @@ import uk.ac.ebi.nmr.fid.Fid;
 import uk.ac.ebi.nmr.fid.LdpfsFourierTransformTool;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.InputStreamReader;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,12 +42,12 @@ public class BrukerReader {
         Acqu acquisition = null;
         Fid fid = null;
 
-        acquisition = new AcquReader(acquFile).read();
+        acquisition = new BrukerAcquReader(acquFile).read();
         // for the moment set only one processing though it is irrelevant for now
         readPROC(1);
 
-        return new LdpfsFourierTransformTool(new FidReader(new FileInputStream(fidFileName), acquisition).read(), acquisition);
-
+        //return new LdpfsFourierTransformTool(new FidReader(new FileInputStream(fidFileName), acquisition).read(), acquisition);
+          return null;
 
     }
 
