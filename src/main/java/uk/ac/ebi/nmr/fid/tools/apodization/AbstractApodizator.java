@@ -1,63 +1,80 @@
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ebi.nmr.fid.tools.apodization;
 
 import uk.ac.ebi.nmr.fid.Acqu;
-import uk.ac.ebi.nmr.fid.Proc;
+import uk.ac.ebi.nmr.fid.Spectrum;
 
 /**
- * Created with IntelliJ IDEA.
+ * Abstract class that applies a window function to the fid in order to reduce noise or enhance signal.
+ *
+ * @author Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 03/04/2013
  * Time: 11:42
- * To change this template use File | Settings | File Templates.
+ *
  */
 abstract public class AbstractApodizator implements Apodizator {
 
-    double[] spectrum;
+    Spectrum spectrum;
     Acqu.AcquisitionMode acquisitionMode= Acqu.AcquisitionMode.SEQUENTIAL;
-    Proc processing;
 
-    public AbstractApodizator(double [] spectrum, Proc processing) {
+    public AbstractApodizator(Spectrum spectrum) {
         this.spectrum = spectrum;
-        this.processing = processing;
     }
 
-    // TODO perhaps change this to accept an Acqu object, to make apparent that the acquisition mode has to be defined
-    public AbstractApodizator(double[] spectrum, Acqu.AcquisitionMode acquisitionMode, Proc processing) {
-        this.spectrum = spectrum;
-        this.acquisitionMode = acquisitionMode;
-        this.processing = processing;
-    }
-
-    public double[] calculate() throws Exception {
-
-        double [] data = new double[processing.getTdEffective()];
+    public Spectrum calculate() throws Exception {
+        // perhaps clone the spectrum otherwise one can have more clashes with the acqu and proc objects
+        // because of imutability issues
+        double [] fid = new double[spectrum.getFid().length];
         if (acquisitionMode.equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
-            for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i++){
-                data[i]=spectrum[i]*calculateFactor(i);
+            for (int i =0 ; i< spectrum.getProc().getTdEffective() && i < spectrum.getFid().length; i++){
+                fid[i]=spectrum.getRealChannelData()[i] * calculateFactor(i);
             }
         } else {
-            for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i+=2){
-                data[i]=spectrum[i]*calculateFactor(i);
-                data[i+1]=spectrum[i+1]*calculateFactor(i);
+            for (int i =0 ; i < spectrum.getFid().length/2; i++){
+                // set real values, i.e. even numbers
+                fid[i*2] = spectrum.getFid()[i * 2] * calculateFactor(i);
+                // set imaginary values, i.e. odd numbers
+                fid[i * 2 + 1]= spectrum.getFid()[i * 2 + 1] * calculateFactor(i);
             }
         }
-        return data;
+        return new Spectrum(fid,spectrum.getAcqu(),spectrum.getProc());
     }
 
-
-    public double[] calculate(double lineBroadning) throws Exception {
-        double [] data = new double[processing.getTdEffective()];
+    public Spectrum calculate(double lineBroadning) throws Exception {
+        double [] fid = new double[spectrum.getFid().length];
+        // this creates issues with immutability, need to clone the proc object
+//        spectrum.getProc().setLineBroadening(lineBroadning);
         if (acquisitionMode.equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
-            for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i++){
-                data[i]=spectrum[i]*calculateFactor(i,lineBroadning);
+            for (int i =0 ; i< spectrum.getProc().getTdEffective() && i < spectrum.getFid().length; i++){
+                fid[i]=spectrum.getFid()[i] * calculateFactor(i, lineBroadning);
             }
         } else {
-            for (int i =0 ; i< processing.getTdEffective() && i < spectrum.length; i+=2){
-                data[i]=spectrum[i]*calculateFactor(i,lineBroadning);
-                data[i+1]=spectrum[i+1]*calculateFactor(i, lineBroadning);
+            for (int i =0 ; i < spectrum.getFid().length/2; i++){
+                // set real values, i.e. even numbers
+                fid[i * 2]= spectrum.getFid()[i * 2] * calculateFactor(i, lineBroadning);
+                // set imaginary values, i.e. odd numbers
+                fid[i * 2 + 1]= spectrum.getFid()[i * 2 + 1] * calculateFactor(i, lineBroadning);
             }
         }
-        return data;
+        return new Spectrum(fid,spectrum.getAcqu(),spectrum.getProc());
     }
 
 

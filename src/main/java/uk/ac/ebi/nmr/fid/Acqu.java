@@ -1,11 +1,31 @@
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ebi.nmr.fid;
 
 /**
- * Created with IntelliJ IDEA.
+ * Data structure for the acquisition parameters
+ *
+ * @author  Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 14/01/2013
  * Time: 14:01
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class Acqu {
 
@@ -34,11 +54,12 @@ public class Acqu {
     private String owner;                        //owner         owner
     private AcquisitionMode acquisitionMode;      //aq_mod        acquisition mode
     private FidData fidType;                     //fid_type      define in class data_par
+    private Spectrometer spectrometer;
 
+    public enum Spectrometer {BRUKER, VARIAN, JEOL}
 
-
-    public Acqu() {
-
+    public Acqu(Spectrometer spectrometer) {
+        this.spectrometer=spectrometer;
     }
 
     public double getTransmiterFreq() {
@@ -255,5 +276,9 @@ public class Acqu {
 
     public void setSpectralFrequency(double spectralFrequency) {
         this.spectralFrequency = spectralFrequency;
+    }
+
+    public Spectrometer getSpectrometer() {
+        return spectrometer;
     }
 }

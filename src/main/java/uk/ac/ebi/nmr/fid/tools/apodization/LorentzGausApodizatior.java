@@ -1,24 +1,40 @@
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ebi.nmr.fid.tools.apodization;
 
-import uk.ac.ebi.nmr.fid.Acqu;
-import uk.ac.ebi.nmr.fid.Proc;
+import uk.ac.ebi.nmr.fid.Spectrum;
 
 /**
- * Created with IntelliJ IDEA.
+ * Applies a Lorentz to Gauss window function to the fid.
+ *
+ * @author Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 03/04/2013
  * Time: 12:25
- * To change this template use File | Settings | File Templates.
+ *
  */
 
 public class LorentzGausApodizatior extends AbstractApodizator {
-    protected LorentzGausApodizatior(double[] spectrum, Proc processing) {
-        super(spectrum, processing);
+    protected LorentzGausApodizatior(Spectrum spectrum) {
+        super(spectrum);
     }
 
-    protected LorentzGausApodizatior(double[] spectrum, Acqu.AcquisitionMode acquisitionMode, Proc processing) {
-        super(spectrum, acquisitionMode, processing);
-    }
 
     /**
      * calculates the weigth for the Lorentz-Guassian apodization: W(i)= (lb*(i*dw)*pi(1-t/(2*tmax)))
@@ -49,15 +65,15 @@ public class LorentzGausApodizatior extends AbstractApodizator {
         if(lbLorentzToGauss>=0)
             throw new Exception ("the Lorentz to Gaussian linebroadening factor has to be negative");
 
-        if(processing.getGbFactor()<= 0 || processing.getGbFactor() > 1)
+        if(spectrum.getProc().getGbFactor()<= 0 || spectrum.getProc().getGbFactor() > 1)
             throw new Exception ("the GB-factor has to be in the interval ]0,1[");
         /*
         cuteNMR implementation
          */
-        double acquisitionTime = processing.getDwellTime()*processing.getTdEffective();
+        double acquisitionTime = spectrum.getProc().getDwellTime()*spectrum.getProc().getTdEffective();
         double a = Math.PI*lbLorentzToGauss;
-        double b = -a/(2.0*processing.getGbFactor()*acquisitionTime);
-        double time=i*processing.getDwellTime();
+        double b = -a/(2.0*spectrum.getProc().getGbFactor()*acquisitionTime);
+        double time=i*spectrum.getProc().getDwellTime();
         return Math.exp(-a*time -b*time*time);
         /*
         Pearson GRE function

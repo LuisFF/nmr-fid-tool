@@ -1,27 +1,42 @@
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ebi.nmr.fid.tools.apodization;
 
-import uk.ac.ebi.nmr.fid.Acqu;
-import uk.ac.ebi.nmr.fid.Proc;
+import uk.ac.ebi.nmr.fid.Spectrum;
 
 /**
- * Created with IntelliJ IDEA.
+ * Applies an exponential window function to the fid.
+ *
+ * @author Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 03/04/2013
  * Time: 11:41
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class ExponentialApodizator extends AbstractApodizator {
 
-    public ExponentialApodizator(double[] spectrum, Proc processing) {
-        super(spectrum, processing);
-    }
-
-    public ExponentialApodizator(double[] spectrum, Acqu.AcquisitionMode acquisitionMode, Proc processing) {
-        super(spectrum, acquisitionMode, processing);
+    public ExponentialApodizator(Spectrum spectrum) {
+        super(spectrum);
     }
 
     /**
-     * calculates the weigth for the guassian apodization: W(i)= exp(-i*dw*lb*Pi)
+     * calculates the weigth for the exponential apodization: W(i)= exp(-i*dw*lb*Pi)
      * where i*dw gives the time coordinate in (s) and the line broadening (as defined in the acqu) is in Hz.
      * The cuteNMR implementation is W(i) = exp(-(dw*i) * lb * pi)
      * In Vogt 2004: W(i)=exp(-lb*(i*dw)^2))
@@ -31,7 +46,7 @@ public class ExponentialApodizator extends AbstractApodizator {
      */
     @Override
     protected double calculateFactor(int i) {
-        return Math.exp(-i*processing.getDwellTime()*processing.getLineBroadening()*Math.PI);
+        return Math.exp(-i*spectrum.getProc().getDwellTime()*spectrum.getProc().getLineBroadening()*Math.PI);
     }
 
     /**
@@ -42,7 +57,7 @@ public class ExponentialApodizator extends AbstractApodizator {
      */
     @Override
     protected double calculateFactor(int i, double lineBroadening) {
-        return Math.exp(-i*processing.getDwellTime()*lineBroadening*Math.PI);
+        return Math.exp(-i*spectrum.getProc().getDwellTime()*lineBroadening*Math.PI);
     }
 
 

@@ -1,24 +1,21 @@
 package uk.ac.ebi.nmr.fid;
 
 /**
- * Created with IntelliJ IDEA.
+ * fft based on cuteNMR implementation
+ *
+ * @author  Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 14/01/2013
  * Time: 14:02
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class LdpfsFourierTransformTool extends AbstractFastFourierTransformTool implements FastFourierTransformTool {
 
-    public LdpfsFourierTransformTool(Fid fid, Acqu acquisition) throws Exception{                
-        this.processing = new Proc(acquisition);        
-        this.fid = fid;
+    public LdpfsFourierTransformTool(Spectrum spectrum) throws Exception{
+        this.fid = spectrum;
     }
 
-    public LdpfsFourierTransformTool(Fid fid, Acqu acquisition, Proc processing) {
-        this.fid=fid;
-        this.acquisition=acquisition;
-        this.processing=processing;
-    }
 
     /**
      * translating the fft from the cuteNMR...
@@ -27,7 +24,7 @@ public class LdpfsFourierTransformTool extends AbstractFastFourierTransformTool 
 
     public void fft(boolean isForward) {
         int j =1;
-        int numberOfPairs=2*processing.getTransformSize();
+        int numberOfPairs=2*fid.getProc().getTransformSize();
         int sign = (isForward)? 1 : -1;
 
         // I have seen this somewhere
@@ -106,6 +103,5 @@ public class LdpfsFourierTransformTool extends AbstractFastFourierTransformTool 
     double[] implementedFFT(double[] apodizedData) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
-
 
 }

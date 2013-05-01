@@ -1,43 +1,39 @@
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ebi.nmr.fid.tools.apodization;
 
-import uk.ac.ebi.nmr.fid.Acqu;
-import uk.ac.ebi.nmr.fid.Proc;
+import uk.ac.ebi.nmr.fid.Spectrum;
 
 /**
- * Created with IntelliJ IDEA.
+ * Adds a set of zeros at the tail of the fid.
+ *
+ * @author Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 03/04/2013
  * Time: 15:16
- * To change this template use File | Settings | File Templates.
  */
-public class ZeroFillApodizator extends AbstractApodizator {
-    public ZeroFillApodizator(double[] spectrum, Proc processing) {
-        super(spectrum, processing);
+public class ZeroFillApodizator  {
+    private Spectrum spectrum;
+    public ZeroFillApodizator(Spectrum spectrum) {
+        this.spectrum = spectrum;
     }
 
-    public ZeroFillApodizator(double[] spectrum, Acqu.AcquisitionMode acquisitionMode, Proc processing) {
-        super(spectrum, acquisitionMode, processing);
-    }
 
-    public double[] calculate(){
-        return run((int) Math.floor(spectrum.length/5));
-    }
-
-    /**
-     * This operation adds a determined set of zeros to the fid tail.
-     * @param numberZeros
-     */
-    private double[] run(int numberZeros) {
-        double[] data;
-        //TODO Check if the sequencial and simultaneous stuff is right...
-        if (acquisitionMode.equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
-            data= new double[spectrum.length+numberZeros];
-        }   else {
-            data= new double[spectrum.length+numberZeros*2];
-        }
-        System.arraycopy(spectrum, 0, data, 0, spectrum.length);
-        for (int i=spectrum.length; i < data.length; i++)
-            data[i]=0;
-        return data;
-    }
+    //TODO write down this class
 }

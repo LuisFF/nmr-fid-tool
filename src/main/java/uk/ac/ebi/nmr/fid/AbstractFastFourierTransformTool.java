@@ -1,34 +1,28 @@
-/**
- * AbstractFastFourierTransformTool.java
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
  *
- * 2013.01.31
- *
- * This file is part of the CheMet library
- * 
- * The CheMet library is free software: you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * CheMet is distributed in the hope that it will be useful,
+ *
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
+ * GNU Lesser General Public License for more details.
+ *
  * You should have received a copy of the GNU Lesser General Public License
- * along with CheMet.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ebi.nmr.fid;
 
 
-import uk.ac.ebi.nmr.fid.tools.apodization.Apodizator;
-import uk.ac.ebi.nmr.fid.tools.apodization.ExponentialApodizator;
-
 /**
  * @name    AbstractFastFourierTransformTool
  * @date    2013.01.31
  * @version $Rev$ : Last Changed $Date$
+ * @author  Luis F. de Figueiredo
  * @author  pmoreno
  * @author  $Author$ (this version)
  * @brief   Abstract Fast Fourier Transform Tool class to be extended by all FFT implementations.
@@ -36,19 +30,19 @@ import uk.ac.ebi.nmr.fid.tools.apodization.ExponentialApodizator;
  */
 public abstract class AbstractFastFourierTransformTool {
 
-    Acqu acquisition;
+
     double[] data; //proc_buffer   apodization::transform::do_fft
     //proc_buffer   apodization::transform::do_fft
-    Fid fid;
-    Proc processing;
+    Spectrum fid;
+
 
     public AbstractFastFourierTransformTool() {
     }
 
-    void applyRedfieldOnSequentialData(Acqu acquisition, Proc processing) {
+    void applyRedfieldOnSequentialData() {
         // for sequential data apply Redfield trick: multiply data by 1 -1 -1 1
-        if (acquisition.getAcquisitionMode().equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
-            for (int i = 0; i < processing.getTdEffective(); i += 4) {
+        if (fid.getAcqu().getAcquisitionMode().equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
+            for (int i = 0; i < fid.getProc().getTdEffective(); i += 4) {
                 data[i + 1] = -(data[i + 1]);
                 data[i + 2] = -(data[i + 2]);
             }
@@ -56,18 +50,19 @@ public abstract class AbstractFastFourierTransformTool {
     }
 
     public double[] computeFFT() {
-        initDataFormat(acquisition, processing);
-        shiftData(processing, acquisition, fid);
-        applyRedfieldOnSequentialData(acquisition, processing);
-        tdRelatedNonUnderstoodRearrangementForSequential(processing, acquisition);
+        initDataFormat();
+        shiftData();
+        applyRedfieldOnSequentialData();
+        tdRelatedNonUnderstoodRearrangementForSequential();
         int signals;
-        processing.setLineBroadening(0.3);
+        fid.getProc().setLineBroadening(0.3);
         /// applyWindowFunctions //window function need to be applied before FT
-        Apodizator apodization = new ExponentialApodizator(data, acquisition.getAcquisitionMode(), processing);
+        //TODO adapt the FFT to the new object Spectrum
+//        Apodizator apodization = new ExponentialApodizator(data, acquisition.getAcquisitionMode(), processing);
         double[] apodizedData = null;
 
         try {
-            apodizedData = apodization.calculate();
+//            apodizedData = apodization.calculate();
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -83,21 +78,17 @@ public abstract class AbstractFastFourierTransformTool {
         return realPart;
     }
 
-    public Acqu getAcquisition() {
-        return acquisition;
-    }
+
 
     public double[] getData() {
         return data;
     }
 
-    public Fid getFid() {
-        return fid;
+    public double[] getFid() {
+        return fid.getFid();
     }
 
-    public Proc getProcessing() {
-        return processing;
-    }
+
 
     /**
      * This is where the implementation of each fft package go.
@@ -106,16 +97,16 @@ public abstract class AbstractFastFourierTransformTool {
      */
     abstract double[] implementedFFT(double[] apodizedData);
 
-    void initDataFormat(Acqu acquisition, Proc processing) {
+    void initDataFormat() {
         // instanciating the array where the fourier transformed spectra will be stored....
-        switch (acquisition.getAcquisitionMode()) {
+        switch (fid.getAcqu().getAcquisitionMode()) {
             case DISP:
             case SIMULTANIOUS:
-                data = new double[2 * processing.getTransformSize()]; // allocate space for processing
+                data = new double[2 * fid.getProc().getTransformSize()]; // allocate space for processing
                 // allocate space for processing
                 break;
             case SEQUENTIAL:
-                data = new double[4 * processing.getTransformSize()]; // allocate space for processing
+                data = new double[4 * fid.getProc().getTransformSize()]; // allocate space for processing
                 // allocate space for processing
                 break;
             default:
@@ -131,20 +122,20 @@ public abstract class AbstractFastFourierTransformTool {
         this.data[index] = point;
     }
 
-    void shiftData(Proc processing, Acqu acquisition, Fid fid) {
+    void shiftData() {
         // perform a left or right shift of the data (ignoring the corresponding portion of the data)
         // the code from cuteNMR was simplified
-        for (int i = 0; i < (processing.getTdEffective() - Math.abs(processing.getShift())); i++) {
-            int dataIndex = (processing.getShift() >= 0) ? i : i - processing.getShift(); // or shift the placement of the data to the right
+        for (int i = 0; i < (fid.getProc().getTdEffective() - Math.abs(fid.getProc().getShift())); i++) {
+            int dataIndex = (fid.getProc().getShift() >= 0) ? i : i - fid.getProc().getShift(); // or shift the placement of the data to the right
             // or shift the placement of the data to the right
-            int fidIndex = (processing.getShift() >= 0) ? i + processing.getShift() : i; // start in the correct order
+            int fidIndex = (fid.getProc().getShift() >= 0) ? i + fid.getProc().getShift() : i; // start in the correct order
             // start in the correct order
-            switch (acquisition.getFidType()) {
+            switch (fid.getAcqu().getFidType()) {
                 case INT32:
-                    data[dataIndex] = (double) fid.getData()[fidIndex];
+                    data[dataIndex] = (double) fid.getFid()[fidIndex];
                     break;
                 case DOUBLE:
-                    data[dataIndex] = fid.getData()[fidIndex];
+                    data[dataIndex] = fid.getFid()[fidIndex];
                     break;
                 case FLOAT:
                     break;
@@ -156,12 +147,13 @@ public abstract class AbstractFastFourierTransformTool {
         }
     }
 
-    void tdRelatedNonUnderstoodRearrangementForSequential(Proc processing, Acqu acquisition) {
+    void tdRelatedNonUnderstoodRearrangementForSequential() {
         //// try to understand this bit of code!!!!
         //nonsense case if SI is set to be less than TD/2
-        int td = (processing.getTdEffective() > 2 * processing.getTransformSize()) ? 2 * processing.getTransformSize() : processing.getTdEffective();
+        int td = (fid.getProc().getTdEffective() > 2 * fid.getProc().getTransformSize()) ?
+                2 * fid.getProc().getTransformSize() : fid.getProc().getTdEffective();
         // move the data from position i to position 2*i, why?
-        if (acquisition.getAcquisitionMode().equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
+        if (fid.getAcqu().getAcquisitionMode().equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
             for (int i = td - 1; i > 0; i--) {
                 data[2 * i] = data[i];
                 data[i] = 0;
@@ -170,5 +162,11 @@ public abstract class AbstractFastFourierTransformTool {
         /////////////////////////////////////////////
     }
 
+    public Proc getProcessing(){
+        return fid.getProc();
+    }
 
+    public Acqu getAcquisition(){
+        return fid.getAcqu();
+    }
 }

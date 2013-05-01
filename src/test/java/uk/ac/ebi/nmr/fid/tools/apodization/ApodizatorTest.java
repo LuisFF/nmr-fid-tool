@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
 package uk.ac.ebi.nmr.fid.tools.apodization;
 
 import org.jfree.chart.ChartFactory;
@@ -14,6 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import uk.ac.ebi.nmr.fid.Acqu;
 import uk.ac.ebi.nmr.fid.Proc;
+import uk.ac.ebi.nmr.fid.Spectrum;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,19 +42,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created with IntelliJ IDEA.
+ * Tests for various window functions
+ *
+ * @author Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 22/01/2013
  * Time: 16:38
- * To change this template use File | Settings | File Templates.
+ *
  */
+
 public class ApodizatorTest {
 
     static Acqu acquisition;
     static Proc processing;
+    static Spectrum spectrum;
 
     static double [] fid;
-    static double [] fidObserved;
     static double [] fidApodizedEM;
     static double [] fidApodizedGM;
     static double [] fidApodizedLGM;
@@ -74,7 +97,7 @@ public class ApodizatorTest {
         }
 
         fid = new double[lines];
-        fidObserved = new double[lines];
+        double[] fid4spectrum = new double[lines];
         fidApodizedEM = new double[lines];
         fidApodizedGM = new double[lines];
         fidApodizedLGM = new double[lines];
@@ -108,7 +131,7 @@ public class ApodizatorTest {
                                 fid[index]=Double.parseDouble(matcher.group(1));
                                 break;
                             case 1 :
-                                fidObserved[index]=Double.parseDouble(matcher.group(1));
+                                fid4spectrum[index]=Double.parseDouble(matcher.group(1));
                                 break;
                             case 2 :
                                 realFTObserved[index]=Double.parseDouble(matcher.group(1));
@@ -136,14 +159,14 @@ public class ApodizatorTest {
                         }
                         ++times;
                     }
-                    dataR.add(index*dw,fidObserved[index]);
+                    dataR.add(index*dw,fid4spectrum[index]);
                     ++index;
                 }
 
                 line=bufferedReader.readLine();
             }
             System.out.println(index);
-            acquisition = new Acqu();
+            acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
             // The test data I have is sequencial, meaning that I have only the FID of the real channel
             // The simultaneous would have the value of the real channel followed by the corresponding value of the
             // imaginary chanel
@@ -157,6 +180,8 @@ public class ApodizatorTest {
             processing.setGbFactor(0.03);
             System.out.println("DW: " +processing.getDwellTime());
             System.out.println("LB: " +processing.getLineBroadening());
+            spectrum = new Spectrum(fid4spectrum,acquisition);
+
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (Exception e) {
@@ -165,96 +190,89 @@ public class ApodizatorTest {
         }
 
         @Test
-        public void TestExponentialApodizator(){
+        public void TestExponentialApodizatorSequential(){
             data = new XYSeries("data");
-            Apodizator expApodizator= new ExponentialApodizator(fidObserved,
-                    Acqu.AcquisitionMode.SEQUENTIAL,processing);
 
-            double[] apodizedExponential= new double[0];
+            Apodizator expApodizator= new ExponentialApodizator(spectrum);
+
+
             try {
-                apodizedExponential = expApodizator.calculate(1);
+                Spectrum apodizedSpectrum = expApodizator.calculate(1);
             boolean controlSTERR = false;
-            for (int i =0; i< fidObserved.length;i++){
-                data.add(i*dw,apodizedExponential[i]);
-                Assert.assertTrue("Numerical deviation above 1E-12",
-                        Math.abs(apodizedExponential[i]-fidApodizedEM[i])<1E-12);
-
-                if(!(controlSTERR) && Math.abs(apodizedExponential[i]-fidApodizedEM[i])>1E-12) {
+            for (int i =0; i< apodizedSpectrum.getFid().length;i++){
+                data.add(i*dw,apodizedSpectrum.getFid()[i]);
+                if(!(controlSTERR) && Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedEM[i])>1E-12) {
                     System.err.println("Exponential apodization with deviation larger than 1E-12");
-                    System.err.println(i+" "+ fidApodizedEM[i]+" "+ apodizedExponential[i]);
+                    System.err.println(i+" "+ fidApodizedEM[i]+" "+ apodizedSpectrum.getFid()[i]);
                     controlSTERR=true;
                 }
+                Assert.assertTrue("Numerical deviation above 1E-12",
+                        Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedEM[i])<1E-12);
+
             }
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
             XYSeriesCollection dataset = new XYSeriesCollection(dataR);
+            dataset.addSeries(data);
             JFreeChart chart = createChart(dataset);
-            dataset = new XYSeriesCollection(data);
-            JFreeChart chart2 = createChart(dataset);
             try {
-                ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart.png"), chart, 864 ,1152);
-                ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart2.png"), chart2, 864 ,1152);
+                ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart-exp.png"), chart, 864 ,1152);
             } catch (IOException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
     }
 
-
     @Test
-    public void TestGaussianApodizator(){
+    public void TestGaussianApodizatorSequential(){
         data = new XYSeries("data");
-        Apodizator gaussApodizator= new GaussianApodizator(fidObserved,
-                Acqu.AcquisitionMode.SEQUENTIAL,processing);
-        double[] apodized = new double[0];
+        Apodizator gaussApodizator= new GaussianApodizator(spectrum);
+
         try {
-            apodized = gaussApodizator.calculate(1);
+            Spectrum apodizedSpectrum = gaussApodizator.calculate(1);
             boolean controlSTERR = false;
-            for (int i =0; i< fidObserved.length;i++){
-                data.add(i*dw,apodized[i]);
-                Assert.assertTrue("Numerical deviation above 1E-12",
-                        Math.abs(apodized[i]-fidApodizedGM[i])<1E-12);
-                if(Math.abs(apodized[i]-fidApodizedGM[i])>1E-12) {
+            for (int i =0; i< apodizedSpectrum.getFid().length;i++){
+                data.add(i*dw,apodizedSpectrum.getFid()[i]);
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedGM[i])>1E-12) {
                     if(!controlSTERR){
                         System.err.println("Gaussian apodization with deviation larger than 1E-12");
-                        System.err.println(i+" "+ fidApodizedGM[i]+" "+ apodized[i]);
+                        System.err.println(i+" "+ fidApodizedGM[i]+" "+ apodizedSpectrum.getFid()[i]);
                         controlSTERR=true;
                     }
                 }
+                Assert.assertTrue("Numerical deviation above 1E-12",
+                        Math.abs(apodizedSpectrum.getFid()[i] - fidApodizedGM[i]) < 1E-12);
+
             }
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection(dataR);
+        dataset.addSeries(data);
         JFreeChart chart = createChart(dataset);
-        dataset = new XYSeriesCollection(data);
-        JFreeChart chart2 = createChart(dataset);
         try {
-            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart.png"), chart, 864 ,1152);
-            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart2.png"), chart2, 864 ,1152);
+            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart-gauss.png"), chart, 864 ,1152);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
-    @Test
-    public void TestLorentzGausApodizator(){
-        data = new XYSeries("data");
-        Apodizator lgApodizator= new LorentzGausApodizatior(fidObserved,
-                Acqu.AcquisitionMode.SEQUENTIAL,processing);
 
-        double[] apodized= new double[0];
+    @Test
+    public void TestLorentzGausApodizatorSequential(){
+        data = new XYSeries("data");
+        Apodizator lgApodizator= new LorentzGausApodizatior(spectrum);
+
         try {
-            apodized = lgApodizator.calculate(-0.3);
+            Spectrum apodizedSpectrum = lgApodizator.calculate(-0.3);
             boolean controlSTERR = false;
             int count=0;
-            for (int i =0; i< fidObserved.length;i++){
-                data.add(i*dw,apodized[i]);
-
-                if(Math.abs(apodized[i]-fidApodizedLGM[i])>1E-3) {
+            for (int i =0; i< apodizedSpectrum.getFid().length;i++){
+                data.add(i*dw,apodizedSpectrum.getFid()[i]);
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedLGM[i])>1E-3) {
                     if(!(controlSTERR)){
                     System.err.println("Lorentz-Gauss apodization with deviation larger than 1E-3");
-                    System.err.println(i+" "+fidApodizedLGM[i]+" "+ apodized[i]);
+                    System.err.println(i+" "+fidApodizedLGM[i]+" "+ apodizedSpectrum.getFid()[i]);
                         controlSTERR=true;
                     }
                     count++;
@@ -266,36 +284,32 @@ public class ApodizatorTest {
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection(dataR);
+        dataset.addSeries(data);
         JFreeChart chart = createChart(dataset);
-        dataset = new XYSeriesCollection(data);
-        JFreeChart chart2 = createChart(dataset);
         try {
-            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart.png"), chart, 864 ,1152);
-            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart2.png"), chart2, 864 ,1152);
+            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart-lgauss.png"), chart, 864 ,1152);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
     @Test
-    public void TestTRAFApodizator(){
+    public void TestTRAFApodizatorSequential(){
         data = new XYSeries("data");
-        Apodizator tarfApodizator= new TrafApodizator(fidObserved,
-                Acqu.AcquisitionMode.SEQUENTIAL,processing);
+        Apodizator tarfApodizator = new TrafApodizator(spectrum);
 
-        double[] apodized= new double[0];
         try {
-            apodized = tarfApodizator.calculate(0.06);
+            Spectrum apodizedSpectrum = tarfApodizator.calculate(0.06);
             boolean controlSTERR = false;
             int count = 0;
-            for (int i =0; i< fidObserved.length;i++){
-                data.add(i*dw,apodized[i]);
+            for (int i =0; i< apodizedSpectrum.getFid().length;i++){
+                data.add(i*dw,apodizedSpectrum.getFid()[i]);
                 Assert.assertTrue("Numerical deviation above 1E-3",
-                        Math.abs(apodized[i]-fidApodizedTRAF[i])<1E-3);
-                if(Math.abs(apodized[i]-fidApodizedTRAF[i])>1E-4) {
+                        Math.abs(apodizedSpectrum.getFid()[i] - fidApodizedTRAF[i]) < 1E-3);
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAF[i])>1E-4) {
                     if(!(controlSTERR)){
                     System.err.println("TRAF apodization with deviation larger than 1E-4");
-                    System.err.println(i+" "+fidApodizedTRAF[i]+" "+ apodized[i]);
+                    System.err.println(i+" "+fidApodizedTRAF[i]+" "+ apodizedSpectrum.getFid()[i]);
                     controlSTERR=true;
                     }
                     count++;
@@ -307,36 +321,33 @@ public class ApodizatorTest {
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection(dataR);
+
+        dataset.addSeries(data);
         JFreeChart chart = createChart(dataset);
-        dataset = new XYSeriesCollection(data);
-        JFreeChart chart2 = createChart(dataset);
         try {
-            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart.png"), chart, 864 ,1152);
-            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart2.png"), chart2, 864 ,1152);
+            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart-traf.png"), chart, 864 ,1152);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
     @Test
-    public void TestTRAFSApodizator(){
+    public void TestTRAFSApodizatorSequential(){
         data = new XYSeries("data");
-        Apodizator tarfsApodizator= new TrafsApodizator(fidObserved,
-                Acqu.AcquisitionMode.SEQUENTIAL,processing);
+        Apodizator tarfsApodizator= new TrafsApodizator(spectrum);
 
-        double[] apodized= new double[0];
         try {
-            apodized = tarfsApodizator.calculate(0.06);
+            Spectrum apodizedSpectrum = tarfsApodizator.calculate(0.06);
             boolean controlSTERR = false;
             int count = 0;
-            for (int i =0; i< fidObserved.length;i++){
-                data.add(i*dw,apodized[i]);
+            for (int i =0; i< apodizedSpectrum.getFid().length;i++){
+                data.add(i*dw,apodizedSpectrum.getFid()[i]);
                 Assert.assertTrue("Numerical deviation above 1E-3",
-                        Math.abs(apodized[i]-fidApodizedTRAFS[i])<1E-3);
-                if(Math.abs(apodized[i]-fidApodizedTRAFS[i])>1E-4) {
+                        Math.abs(apodizedSpectrum.getFid()[i] - fidApodizedTRAFS[i ]) < 1E-3);
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAFS[i])>1E-4) {
                     if(!(controlSTERR) ){
                     System.err.println("TRAFS apodization with deviation larger than 1E-4");
-                    System.err.println(i+" "+fidApodizedTRAFS[i]+" "+ apodized[i]);
+                    System.err.println(i+" "+fidApodizedTRAFS[i]+" "+ apodizedSpectrum.getFid()[i]);
                     controlSTERR=true;
                     }
                     count++;
@@ -348,12 +359,10 @@ public class ApodizatorTest {
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection(dataR);
+        dataset.addSeries(data);
         JFreeChart chart = createChart(dataset);
-        dataset = new XYSeriesCollection(data);
-        JFreeChart chart2 = createChart(dataset);
         try {
-            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart.png"), chart, 864 ,1152);
-            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart2.png"), chart2, 864 ,1152);
+            ChartUtilities.saveChartAsPNG(new File("/Users/ldpf/Downloads/chart-trafs.png"), chart, 864 ,1152);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -370,6 +379,7 @@ public class ApodizatorTest {
                 true,                     // tooltips
                 false                     // urls
         );
+
         XYPlot plot = (XYPlot) chart.getPlot();
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         renderer.setSeriesLinesVisible(0, true);

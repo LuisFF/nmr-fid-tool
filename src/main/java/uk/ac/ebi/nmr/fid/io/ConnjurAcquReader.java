@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ebi.nmr.fid.io;
 
 import edu.uchc.connjur.core.DimInfo;
@@ -11,19 +28,24 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created with IntelliJ IDEA.
+ * Connjur integration to read acquisition parameters
+ *
+ * @author Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 02/04/2013
  * Time: 16:25
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class ConnjurAcquReader implements AcquReader {
 
 
     private BrukerDataSetReader dataSetReader;
+    private Acqu.Spectrometer spectrometer;
 
-    public ConnjurAcquReader(File file) {
-        dataSetReader = new BrukerDataSetReader();
+    public ConnjurAcquReader(File file,Acqu.Spectrometer spectrometer) {
+        this.dataSetReader = new BrukerDataSetReader();
+        this.spectrometer=spectrometer;
         try {
             dataSetReader.setDataSource(file);
         } catch (IOException e) {
@@ -33,7 +55,7 @@ public class ConnjurAcquReader implements AcquReader {
     }
     @Override
     public Acqu read() throws Exception {
-        Acqu acqu = new Acqu();
+        Acqu acqu = new Acqu(spectrometer);
 
         DataControl dataControl = new DataControl();
         SwDataSet dataSet = dataSetReader.read(null,dataControl);

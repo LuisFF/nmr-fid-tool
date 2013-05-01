@@ -25,9 +25,10 @@
  */
 package uk.ac.ebi.nmr.fid.io;
 
+import org.apache.commons.lang3.ArrayUtils;
 import uk.ac.ebi.nmr.fid.Acqu;
-import uk.ac.ebi.nmr.fid.Fid;
 import uk.ac.ebi.nmr.fid.Proc;
+import uk.ac.ebi.nmr.fid.Spectrum;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -36,8 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA. User: ldpf Date: 14/01/2013 Time: 14:12 To change this template use File | Settings |
- * File Templates.
+ * Reader for Bruker's fid file. The code is based in cuteNMR's code.
+ *
+ * @author Luis F. de Figueiredo
+ *
  */
 public class CuteNMRFidReader implements FidReader {
 
@@ -57,9 +60,9 @@ public class CuteNMRFidReader implements FidReader {
         this.processing = processing;
     }
 
-    public Fid read() throws Exception {
+    public Spectrum read() throws Exception {
 
-        Fid fid = null;
+
 
         DataInputStream in = null;
 
@@ -67,7 +70,7 @@ public class CuteNMRFidReader implements FidReader {
         byte[] result = new byte[4];
         int[] fidInt = null;
         List<Integer> data = new ArrayList<Integer>();
-        double[] fidDouble = null;
+
         int totalBytesRead = 0;
         System.out.println(acquisition.is32Bit());
         if (acquisition.is32Bit()) {
@@ -104,7 +107,7 @@ public class CuteNMRFidReader implements FidReader {
 
         } else {
             //TODO read 64bit FIDs... and store it as double?
-            fidDouble = new double[acquisition.getAquiredPoints()];
+//            fidDouble = new double[acquisition.getAquiredPoints()];
 
         }
 
@@ -113,7 +116,12 @@ public class CuteNMRFidReader implements FidReader {
 
         System.out.println("Num bytes read: " + totalBytesRead);
 
-        return new Fid(data);
+        fidInt = ArrayUtils.toPrimitive(data.toArray(new Integer[data.size()]));
+        double[] fid = new double[fidInt.length];
+        for(int i =0; i<fidInt.length;i++)
+            fid[i]=(double) fidInt[i];
+
+        return new Spectrum(fid, acquisition);
 
     }
 }

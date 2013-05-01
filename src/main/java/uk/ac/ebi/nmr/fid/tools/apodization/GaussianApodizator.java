@@ -1,24 +1,40 @@
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ebi.nmr.fid.tools.apodization;
 
-import uk.ac.ebi.nmr.fid.Acqu;
-import uk.ac.ebi.nmr.fid.Proc;
+import uk.ac.ebi.nmr.fid.Spectrum;
 
 /**
- * Created with IntelliJ IDEA.
+ * Applies a gaussian window function to the fid.
+ *
+ * @author Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 03/04/2013
  * Time: 12:32
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class GaussianApodizator extends AbstractApodizator {
 
-    public GaussianApodizator(double[] spectrum, Proc processing) {
-        super(spectrum, processing);
+    public GaussianApodizator(Spectrum spectrum) {
+        super(spectrum);
     }
 
-    public GaussianApodizator(double[] spectrum, Acqu.AcquisitionMode acquisitionMode, Proc processing) {
-        super(spectrum, acquisitionMode, processing);
-    }
 
     /**
      * calculates the weigth for the guassian apodization: W(i)=exp(-2(i*dw*lb)^2)
@@ -31,6 +47,7 @@ public class GaussianApodizator extends AbstractApodizator {
      */
     @Override
     protected double calculateFactor(int i) throws Exception {
+        spectrum.getProc().setLineBroadening(0.1);
         return calculateFactor(i,0.1);
     }
 
@@ -47,7 +64,7 @@ public class GaussianApodizator extends AbstractApodizator {
         // original expression: (1.0/std::sqrt(2))/par->lbGauss * (1.0/std::sqrt(2))/par->lbGauss;
 //        double sigmaFactor=0.5*Math.pow(1/lbGauss,2);
 
-        double time = i*processing.getDwellTime();
+        double time = i*spectrum.getProc().getDwellTime();
         return Math.exp(-2*Math.pow(time*lbGauss,2));
     }
 

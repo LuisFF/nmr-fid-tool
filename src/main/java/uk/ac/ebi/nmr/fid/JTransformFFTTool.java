@@ -1,22 +1,18 @@
-/**
- * JTransformFFTTool.java
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
  *
- * 2013.01.31
- *
- * This file is part of the CheMet library
- * 
- * The CheMet library is free software: you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * CheMet is distributed in the hope that it will be useful,
+ *
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
+ * GNU Lesser General Public License for more details.
+ *
  * You should have received a copy of the GNU Lesser General Public License
- * along with CheMet.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package uk.ac.ebi.nmr.fid;
@@ -29,6 +25,8 @@ import org.apache.log4j.Logger;
  * @name    JTransformFFTTool
  * @date    2013.01.31
  * @version $Rev$ : Last Changed $Date$
+ *
+ * @author  Luis F. de Figueiredo
  * @author  pmoreno
  * @author  $Author$ (this version)
  * @brief   ...class description...
@@ -37,17 +35,10 @@ import org.apache.log4j.Logger;
 public class JTransformFFTTool extends AbstractFastFourierTransformTool implements FastFourierTransformTool{
 
     private static final Logger LOGGER = Logger.getLogger( JTransformFFTTool.class );
-    
-    public JTransformFFTTool(Fid fid, Acqu acquisition) throws Exception{                
-        this.processing = new Proc(acquisition);     
-        this.acquisition = acquisition;
-        this.fid = fid;
-    }
 
-    public JTransformFFTTool(Fid fid, Acqu acquisition, Proc processing) {
-        this.fid=fid;
-        this.acquisition=acquisition;
-        this.processing=processing;
+    public JTransformFFTTool(Spectrum spectrum) {
+        this.fid=spectrum;
+
     }
 
     @Override
@@ -62,4 +53,8 @@ public class JTransformFFTTool extends AbstractFastFourierTransformTool implemen
     }
 
 
+    @Override
+    public Proc getProcessing() {
+        return fid.getProc();  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

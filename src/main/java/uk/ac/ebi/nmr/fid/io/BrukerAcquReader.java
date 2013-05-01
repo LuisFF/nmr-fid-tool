@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package uk.ac.ebi.nmr.fid.io;
 
 import uk.ac.ebi.nmr.fid.Acqu;
@@ -12,11 +29,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created with IntelliJ IDEA.
+ * Reader for Bruker's acqu and acqus files
+ *
+ * @author Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 14/01/2013
  * Time: 14:12
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class BrukerAcquReader implements AcquReader {
 
@@ -85,7 +105,7 @@ public class BrukerAcquReader implements AcquReader {
     @Override
     public Acqu read() throws Exception {
         Matcher matcher;
-        Acqu acquisition = new Acqu();
+        Acqu acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
         String line = inputAcqReader.readLine();
         while (inputAcqReader.ready() && (line != null)) {
             if (REGEXP_SFO1.matcher(line).find()) {
