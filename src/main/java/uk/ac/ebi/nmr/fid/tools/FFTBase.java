@@ -6,8 +6,10 @@ package uk.ac.ebi.nmr.fid.tools;
  * User: ldpf
  * Date: 21/01/2013
  * Time: 10:20
- * To change this template use File | Settings | File Templates.
+ *
  */
+
+@Deprecated
 public class FFTBase {
     /**
      * The Fast Fourier Transform (generic version, with NO optimizations).

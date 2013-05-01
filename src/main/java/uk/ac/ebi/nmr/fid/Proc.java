@@ -1,36 +1,31 @@
-/**
- * 
- * Copyright (C) 2010  Pascal Fricke
- * Copyright (C) 2000-2010  Kirk Marat, The University of Manitoba
- * 
- * 
- * This file is part of nmr-fid library. 
- * nmr-fid library is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+/*
+ * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
- * nmr-fid library is distributed in the hope that it will be useful,
+ *
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with cuteNMR.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * This code is based upon the libraries released by Dr Kirk Marat from the University
- * of Manitoba and cuteNMR:
- *      ftp://davinci.chem.umanitoba.ca/pub/marat/SpinWorks/source_library/
- *      https://sourceforge.net/projects/cutenmr/
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package uk.ac.ebi.nmr.fid;
 
 /**
- * Created with IntelliJ IDEA.
+ * Data structure for the spectra processing parameters
+ *
+ * @author  Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 14/01/2013
  * Time: 14:02
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class Proc {
 
@@ -60,6 +55,13 @@ public class Proc {
     private int leftShift=0;             //leftshift     ft_settings_dialog::ft_settings_dialog
     private int shift;                   //j             apodization::transform::do_fft
     private int increment;               //i             apodization::transform::do_fft
+
+    private double dspPhase;
+
+    private WindowFunctions windowFunction;
+
+    public enum WindowFunctions{EXPONENTIAL,GAUSSIAN,LORENTZGAUS,SINE,SINESQUARED,TRAF,TRAFS}
+
 
     public Proc(Acqu acquisition) throws Exception{
 
@@ -237,5 +239,21 @@ public class Proc {
 
     public double getDwellTime() {
         return dwellTime;
+    }
+
+    public double getDspPhase() {
+        return dspPhase;
+    }
+
+    public void setDspPhase(double dspPhase) {
+        this.dspPhase = dspPhase;
+    }
+
+    public WindowFunctions getWindowFunction() {
+        return windowFunction;
+    }
+
+    public void setWindowFunction(WindowFunctions windowFunction) {
+        this.windowFunction = windowFunction;
     }
 }

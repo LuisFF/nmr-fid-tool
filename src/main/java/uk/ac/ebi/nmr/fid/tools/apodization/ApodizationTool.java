@@ -33,13 +33,15 @@ import uk.ac.ebi.nmr.fid.Proc;
  * 
  * Copyright (C) 2010  Pascal Fricke
  * Copyright (C) 2000-2010  Kirk Marat, The University of Manitoba
- * 
- * Created with IntelliJ IDEA.
+ *
+ * @author Luis F. de Figueiredo
+ *
  * User: ldpf
  * Date: 14/01/2013
  * Time: 13:54
- * To change this template use File | Settings | File Templates.
  */
+
+@Deprecated
 public class ApodizationTool {
     private static double[] spectrum;
     private Acqu.AcquisitionMode acquisitionMode= Acqu.AcquisitionMode.SEQUENTIAL;
