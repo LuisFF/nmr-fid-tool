@@ -17,7 +17,6 @@
 
 package uk.ac.ebi.nmr.fid.io;
 
-import edu.uchc.connjur.spectrumtranslator.UnexpectedDataException;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ebi.nmr.fid.Acqu;
@@ -39,7 +38,7 @@ import java.io.IOException;
 public class FidReaderTest {
 
     @Test
-    public void testCuteNMRFidReader() throws IOException, UnexpectedDataException {
+    public void testCuteNMRFidReader() throws IOException{
         File fidFile = new File("/Users/ldpf/SVN/ldpf/dev/nmr-tools/src/test/java/"+
                 "resources/examples/file_formats/bmse000109/1H/fid");
 

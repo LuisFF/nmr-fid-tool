@@ -29,7 +29,7 @@ package uk.ac.ebi.nmr.fid;
  */
 public class Spectrum {
 
-    private final uk.ac.ebi.nmr.fid.tools.phasing.DSPPhaseCorrection DSPPhaseCorrection = new uk.ac.ebi.nmr.fid.tools.phasing.DSPPhaseCorrection(this);
+
     private Acqu acqu;
     private Proc proc;
     private double [] fid;
