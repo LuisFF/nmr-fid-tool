@@ -25,6 +25,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.ByteOrder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +43,7 @@ import java.util.regex.Pattern;
  */
 public class BrukerProcReader implements ProcReader {
 
-    private File procFile;
+    private BufferedReader procFile;
     private static Acqu acquisition;
     // parameters from proc
     private final static Pattern REGEXP_SI = Pattern.compile("\\#\\#\\$SI= (\\d+\\.\\d+)"); //transform size (complex)
@@ -53,16 +56,21 @@ public class BrukerProcReader implements ProcReader {
     private final static Pattern REGEXP_PHC1 = Pattern.compile("\\#\\#\\$PHC1= (-?\\d+\\.\\d+)"); //first order phase
     private final static Pattern REGEXP_SSB = Pattern.compile("\\#\\#\\$SSB= (-?\\d+\\.\\d+)"); //sine bell shift
     private final static Pattern REGEXP_MC2 = Pattern.compile("\\#\\#\\$MC2= (\\d+)"); //F1 detection mode
+    private final static Pattern REGEXP_BYTORDA = Pattern.compile("\\#\\#\\$BYTORDP= (\\d+)"); //byte order
+    private final static Pattern REGEXP_DTYPP = Pattern.compile("\\#\\#\\$DTYPP= (\\d+)"); //data type (0 -> 32 bit int, 1 -> 64 bit double)
+    private final static Pattern REGEXP_TDEFF = Pattern.compile("\\#\\#\\$TDeff= (\\d+)"); // number of datapoints in the real and imaginary files
 
-    
-
-    public BrukerProcReader(File procFile, Acqu acquisition) {
-        this.procFile=procFile;
+    public BrukerProcReader(File procFile, Acqu acquisition) throws FileNotFoundException {
+        this.procFile = new BufferedReader(new FileReader(procFile));
         this.acquisition=acquisition;
     }
 
     public BrukerProcReader(String filename) throws FileNotFoundException {
-        this.procFile = new File(filename);
+        this(new File(filename),acquisition);
+    }
+
+    public BrukerProcReader(InputStream procFileInputStream, Acqu acquisition) throws FileNotFoundException {
+        this.procFile = new BufferedReader(new InputStreamReader(procFileInputStream));
         this.acquisition=acquisition;
     }
 
@@ -76,9 +84,8 @@ public class BrukerProcReader implements ProcReader {
         }
         Matcher matcher;
 //        Acqu acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
-        BufferedReader input = new BufferedReader(new FileReader(procFile));
-        String line = input.readLine();
-        while (input.ready() && (line != null)) {
+        String line = procFile.readLine();
+        while (procFile.ready() && (line != null)) {
             if(REGEXP_SI.matcher(line).find()){
                 matcher=REGEXP_SI.matcher(line);
                 matcher.find();
@@ -129,9 +136,33 @@ public class BrukerProcReader implements ProcReader {
                 matcher.find();
                 processing.setSsb(Double.parseDouble(matcher.group(1)));
             }
-            line = input.readLine();
+            if (REGEXP_TDEFF.matcher(line).find()){
+                matcher = REGEXP_TDEFF.matcher(line);
+                matcher.find();
+                processing.setTdEffective(Integer.parseInt(matcher.group(1)));
+            }
+            if (REGEXP_BYTORDA.matcher(line).find()){
+                matcher = REGEXP_BYTORDA.matcher(line);
+                matcher.find();
+                switch (Integer.parseInt(matcher.group(1))){
+                    case 0 :
+                        processing.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+                        break;
+                    case 1 :
+                        processing.setByteOrder(ByteOrder.BIG_ENDIAN);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (REGEXP_DTYPP.matcher(line).find()) {
+                matcher = REGEXP_DTYPP.matcher(line);
+                matcher.find();
+                processing.set32Bit((Pattern.compile("0").matcher(matcher.group(1)).find()));
+            }
+            line = procFile.readLine();
         }
-        input.close();
+        procFile.close();
         return processing;
     }
 }

@@ -23,7 +23,6 @@ import uk.ac.ebi.nmr.fid.Spectrum;
 
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
@@ -58,16 +57,10 @@ public class Simple1DFidReader implements FidReader {
         FileChannel inChannel = fidInput.getChannel();
         ByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
         if (acquisition.is32Bit()) {
-
             int[] result = new int[(int) inChannel.size()/4];
-
-            System.out.println("number of points in the fid file: " + inChannel.size()/4);
-            // byteOrder == 1 => Big-Endian else Little-Endian
+            System.out.println("Number of points in the fid: " + inChannel.size()/4);
             // this has to do with the order of the bytes
-            if (acquisition.getByteOrder() == 1)
-                buffer.order( ByteOrder.BIG_ENDIAN);
-            else
-                buffer.order( ByteOrder.LITTLE_ENDIAN);
+            buffer.order(acquisition.getByteOrder());
             //read the integers
             IntBuffer intBuffer = buffer.asIntBuffer( );
             intBuffer.get(result);
@@ -77,14 +70,9 @@ public class Simple1DFidReader implements FidReader {
 
         } else { // its a 64bit file encoding doubles
                 double [] result = new double[(int) inChannel.size()/8];
-
-                System.out.println("number of points in the fid file: " + inChannel.size()/8);
-                // byteOrder == 1 => Big-Endian else Little-Endian
+                System.out.println("Number of points in the fid: " + inChannel.size()/8);
                 // this has to do with the order of the bytes
-                if (acquisition.getByteOrder() == 1)
-                    buffer.order( ByteOrder.BIG_ENDIAN);
-                else
-                    buffer.order( ByteOrder.LITTLE_ENDIAN);
+                buffer.order(acquisition.getByteOrder());
                 //read the integers
                 DoubleBuffer doubleBuffer = buffer.asDoubleBuffer();
                 doubleBuffer.get(result);

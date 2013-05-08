@@ -17,8 +17,10 @@
 
 package uk.ac.ebi.nmr.fid;
 
+import java.nio.ByteOrder;
+
 /**
- * Data structure for the spectra processing parameters
+ * Data structure for the spectra processing parameters.
  *
  * @author  Luis F. de Figueiredo
  *
@@ -40,6 +42,8 @@ public class Proc {
     private double ssb;                  //ssb               sine bell shift
     private double ssbSine;              //ssbSine           sine bell shift
     private double ssbSineSquared;       //ssbSineSquared    sine bell shift
+    private ByteOrder byteOrder;         //bytordp           byte order (0 -> Little endian, 1 -> Big Endian)
+    private boolean integerType;         //dtypp             data type (0 -> 32 bit int, 1 -> 64 bit double)
 
     // obtained after reading the FID but could it be obtained from the Bruker?
     private int transformSize;           //si                transform size (complex)    bruker_read::get_fid
@@ -47,17 +51,15 @@ public class Proc {
     private double hertzPerPoint;        //hzperpt                                       bruker_read::get_fid
     private double ppmPerPoint;          //ppmperpt                                      bruker_read::get_fid
     private double spectraWidthHertz;    //sw_h                                          bruker_read::get_fid
-    private double offset;               //offset                                        bruker_read::get_fid
 
+    private double offset;               //offset                                        bruker_read::get_fid
     //TODO consider moving this to the Fourier Transformed class or processing class....
     // variables required later...
     private int tdEffective;             //td_eff        apodization::transform::do_fft
     private int leftShift=0;             //leftshift     ft_settings_dialog::ft_settings_dialog
     private int shift;                   //j             apodization::transform::do_fft
     private int increment;               //i             apodization::transform::do_fft
-
     private double dspPhase;
-
     private WindowFunctions windowFunction;
 
     public enum WindowFunctions{EXPONENTIAL,GAUSSIAN,LORENTZGAUS,SINE,SINESQUARED,TRAF,TRAFS}
@@ -255,5 +257,21 @@ public class Proc {
 
     public void setWindowFunction(WindowFunctions windowFunction) {
         this.windowFunction = windowFunction;
+    }
+
+    public ByteOrder getByteOrder() {
+        return byteOrder;
+    }
+
+    public void setByteOrder(ByteOrder byteOrder) {
+        this.byteOrder = byteOrder;
+    }
+
+    public boolean is32Bit() {
+        return integerType;
+    }
+
+    public void set32Bit(boolean integerType) {
+        this.integerType = integerType;
     }
 }
