@@ -17,6 +17,8 @@
 
 package uk.ac.ebi.nmr.fid;
 
+import java.nio.ByteOrder;
+
 /**
  * Data structure for the acquisition parameters
  *
@@ -41,7 +43,6 @@ public class Acqu {
     private int dspDecimation;                   //decim         DSP decimation factor
     private int dspFirmware;                     //dspfvs        DSP firmware version
     private double dspGroupDelay;                //grpdly        DSP group delay
-    private int byteOrder;                       //bytorda       byte order
     private int filterType;                      //digmod        filter type
     private int numberOfScans;                   //ns            number of scans
     private boolean integerType;                 //dtypa         data type (0 -> 32 bit int, 1 -> 64 bit double)
@@ -54,6 +55,8 @@ public class Acqu {
     private String owner;                        //owner         owner
     private AcquisitionMode acquisitionMode;      //aq_mod        acquisition mode
     private FidData fidType;                     //fid_type      define in class data_par
+    private ByteOrder byteOrder;                 //bytorda       byte order (0 -> Little endian, 1 -> Big Endian)
+
     private Spectrometer spectrometer;
 
     public enum Spectrometer {BRUKER, VARIAN, JEOL}
@@ -134,11 +137,11 @@ public class Acqu {
         this.dspGroupDelay = dspGroupDelay;
     }
 
-    public int getByteOrder() {
+    public ByteOrder getByteOrder() {
         return byteOrder;
     }
 
-    public void setByteOrder(int byteOrder) {
+    public void setByteOrder(ByteOrder byteOrder) {
         this.byteOrder = byteOrder;
     }
 

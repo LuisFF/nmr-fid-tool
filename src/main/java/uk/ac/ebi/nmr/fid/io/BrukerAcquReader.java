@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteOrder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -156,7 +157,16 @@ public class BrukerAcquReader implements AcquReader {
             if (REGEXP_BYTORDA.matcher(line).find()) {
                 matcher = REGEXP_BYTORDA.matcher(line);
                 matcher.find();
-                acquisition.setByteOrder(Integer.parseInt(matcher.group(1)));
+                switch (Integer.parseInt(matcher.group(1))){
+                    case 0 :
+                        acquisition.setByteOrder(ByteOrder.LITTLE_ENDIAN);
+                        break;
+                    case 1 :
+                        acquisition.setByteOrder(ByteOrder.BIG_ENDIAN);
+                        break;
+                    default:
+                        break;
+                }
             }
             if (REGEXP_AQ_MODE.matcher(line).find()) {
                 matcher = REGEXP_AQ_MODE.matcher(line);

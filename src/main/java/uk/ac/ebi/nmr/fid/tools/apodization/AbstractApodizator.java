@@ -33,7 +33,7 @@ import uk.ac.ebi.nmr.fid.Spectrum;
 abstract public class AbstractApodizator implements Apodizator {
 
     Spectrum spectrum;
-    Acqu.AcquisitionMode acquisitionMode= Acqu.AcquisitionMode.SEQUENTIAL;
+
 
     public AbstractApodizator(Spectrum spectrum) {
         this.spectrum = spectrum;
@@ -43,7 +43,7 @@ abstract public class AbstractApodizator implements Apodizator {
         // perhaps clone the spectrum otherwise one can have more clashes with the acqu and proc objects
         // because of imutability issues
         double [] fid = new double[spectrum.getFid().length];
-        if (acquisitionMode.equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
+        if (spectrum.getAcqu().getAcquisitionMode().equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
             for (int i =0 ; i< spectrum.getProc().getTdEffective() && i < spectrum.getFid().length; i++){
                 fid[i]=spectrum.getRealChannelData()[i] * calculateFactor(i);
             }
@@ -62,7 +62,7 @@ abstract public class AbstractApodizator implements Apodizator {
         double [] fid = new double[spectrum.getFid().length];
         // this creates issues with immutability, need to clone the proc object
 //        spectrum.getProc().setLineBroadening(lineBroadning);
-        if (acquisitionMode.equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
+        if (spectrum.getAcqu().getAcquisitionMode().equals(Acqu.AcquisitionMode.SEQUENTIAL)) {
             for (int i =0 ; i< spectrum.getProc().getTdEffective() && i < spectrum.getFid().length; i++){
                 fid[i]=spectrum.getFid()[i] * calculateFactor(i, lineBroadning);
             }
