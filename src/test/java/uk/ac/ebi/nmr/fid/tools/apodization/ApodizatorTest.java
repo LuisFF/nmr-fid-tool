@@ -141,13 +141,13 @@ public class ApodizatorTest {
         try {
             Spectrum apodizedSpectrum = expApodizator.calculate(0.3);
             boolean controlSTERR = false;
-            Assert.assertArrayEquals("Numerical deviation above 1E-8", fidApodizedEM, apodizedSpectrum.getFid(),1E-8);
+            Assert.assertArrayEquals("Numerical deviation above 1E-12", fidApodizedEM, apodizedSpectrum.getFid(),1E-12);
             // consider removing this bit below
 
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
                 data.add(i, apodizedSpectrum.getFid()[i]);
-                if(!(controlSTERR) && Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedEM[i])>1E-9) {
-                    System.err.println("Exponential apodization with deviation larger than 1E-9");
+                if(!(controlSTERR) && Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedEM[i])>1E-12) {
+                    System.err.println("Exponential apodization with deviation larger than 1E-12");
                     System.err.println(i + " " + fidApodizedEM[i] + " " + apodizedSpectrum.getFid()[i]);
                     controlSTERR=true;
                 }
@@ -173,15 +173,15 @@ public class ApodizatorTest {
 
         try {
             Spectrum apodizedSpectrum = gaussApodizator.calculate(0.3);
-            Assert.assertArrayEquals("Numerical deviation above 1E-7", fidApodizedGM, apodizedSpectrum.getFid(),1E-7);
+            Assert.assertArrayEquals("Numerical deviation above 1E-12", fidApodizedGM, apodizedSpectrum.getFid(),1E-12);
 
             // consider removing this bit below
             boolean controlSTERR = false;
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
                 data.add(i,apodizedSpectrum.getFid()[i]);
-                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedGM[i])>1E-8) {
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedGM[i])>1E-12) {
                     if(!controlSTERR){
-                        System.err.println("Gaussian apodization with deviation larger than 1E-8");
+                        System.err.println("Gaussian apodization with deviation larger than 1E-12");
                         System.err.println(i+" "+ fidApodizedGM[i]+" "+ apodizedSpectrum.getFid()[i]);
                         controlSTERR=true;
                     }
@@ -206,25 +206,27 @@ public class ApodizatorTest {
         data = new XYSeries("data");
         Apodizator lgApodizator= new LorentzGausApodizatior(spectrum);
         spectrum.getProc().setGbFactor(0.03);
+        //changes in the definition of the TdEffective will affect LotentzGaus, TRAF and TRAFS Apodizators
+        spectrum.getProc().setTdEffective(acquisition.getAquiredPoints()/2);
 
         try {
             Spectrum apodizedSpectrum = lgApodizator.calculate(-0.3);
-            Assert.assertArrayEquals("Numerical deviation above 1", fidApodizedLGM, apodizedSpectrum.getFid(),1);
+            Assert.assertArrayEquals("Numerical deviation above 1E-4", fidApodizedLGM, apodizedSpectrum.getFid(),1E-4);
             // consider removing this bit below
             boolean controlSTERR = false;
             int count=0;
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
                 data.add(i,apodizedSpectrum.getFid()[i]);
-                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedLGM[i])>1E-2) {
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedLGM[i])>1E-5) {
                     if(!(controlSTERR)){
-                    System.err.println("Lorentz-Gauss apodization with deviation larger than 1E-2");
+                    System.err.println("Lorentz-Gauss apodization with deviation larger than 1E-5");
                     System.err.println(i+" "+fidApodizedLGM[i]+" "+ apodizedSpectrum.getFid()[i]);
                         controlSTERR=true;
                     }
                     count++;
                 }
             }
-            System.out.println("Lorentz-Gauss apodization deviations above 1E-2: "+count);
+            System.out.println("Lorentz-Gauss apodization deviations above 1E-5: "+count);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -246,22 +248,22 @@ public class ApodizatorTest {
 
         try {
             Spectrum apodizedSpectrum = tarfApodizator.calculate(0.06);
-            Assert.assertArrayEquals("Numerical deviation above 1", fidApodizedTRAF, apodizedSpectrum.getFid(),1);
+            Assert.assertArrayEquals("Numerical deviation above 1E-5", fidApodizedTRAF, apodizedSpectrum.getFid(),1E-5);
             // consider removing this bit below
             boolean controlSTERR = false;
             int count = 0;
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
                 data.add(i,apodizedSpectrum.getFid()[i]);
-                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAF[i])>1E-2) {
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAF[i])>1E-6) {
                     if(!(controlSTERR)){
-                    System.err.println("TRAF apodization with deviation larger than 1E-2");
+                    System.err.println("TRAF apodization with deviation larger than 1E-6");
                     System.err.println(i+" "+fidApodizedTRAF[i]+" "+ apodizedSpectrum.getFid()[i]);
                     controlSTERR=true;
                     }
                     count++;
                 }
             }
-            System.out.println("TRAF apodization deviations above 1E-2: "+count);
+            System.out.println("TRAF apodization deviations above 1E-6: "+count);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -284,22 +286,22 @@ public class ApodizatorTest {
 
         try {
             Spectrum apodizedSpectrum = tarfsApodizator.calculate(0.06);
-            Assert.assertArrayEquals("Numerical deviation above 1", fidApodizedTRAFS, apodizedSpectrum.getFid(),1);
+            Assert.assertArrayEquals("Numerical deviation above 1E-4", fidApodizedTRAFS, apodizedSpectrum.getFid(),1E-4);
             // consider removing this bit below
             boolean controlSTERR = false;
             int count = 0;
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
                 data.add(i,apodizedSpectrum.getFid()[i]);
-                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAFS[i])>1E-2) {
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAFS[i])>1E-5) {
                     if(!(controlSTERR) ){
-                    System.err.println("TRAFS apodization with deviation larger than 1E-2");
+                    System.err.println("TRAFS apodization with deviation larger than 1E-5");
                     System.err.println(i+" "+fidApodizedTRAFS[i]+" "+ apodizedSpectrum.getFid()[i]);
                     controlSTERR=true;
                     }
                     count++;
                 }
             }
-            System.out.println("TRAFS apodization deviations above 1E-2: "+count);
+            System.out.println("TRAFS apodization deviations above 1E-5: "+count);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
