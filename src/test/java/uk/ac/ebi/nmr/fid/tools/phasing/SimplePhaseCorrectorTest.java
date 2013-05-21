@@ -11,6 +11,8 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.ebi.nmr.fid.Acqu;
 import uk.ac.ebi.nmr.fid.Spectrum;
@@ -22,6 +24,8 @@ import uk.ac.ebi.nmr.fid.tools.apodization.ExponentialApodizator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,9 +35,71 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class SimplePhaseCorrectorTest {
-
+    static double [] fid;
+    static double [] realRaw;
+    static double [] realPH0;
+    static double [] imagRaw;
+    static double [] imagPH0;
     XYSeries data;
 
+    @BeforeClass
+    public static void loadExternalData () {
+        try{
+            fid= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-sim-raw-dsp.ser"));
+            realRaw= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-fft-1r-sim-dsp.ser"));
+            imagRaw= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-fft-1i-sim-dsp.ser"));
+            realPH0= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-fft-phased-1r-sim-dsp.ser"));
+            imagPH0= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-fft-phased-1i-sim-dsp.ser"));
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+
+    }
+
+    private static Object loadSerializedObject(InputStream inputStream) throws IOException, ClassNotFoundException {
+        long startTime = System.currentTimeMillis();
+        ObjectInputStream ois = new ObjectInputStream(inputStream);
+        Object serializedOject = ois.readObject();
+        long endTime   = System.currentTimeMillis();
+        System.out.println("Time reading object in "+inputStream.toString()+":\t\t"+(endTime - startTime)+" ms");
+        return serializedOject;
+    }
+
+    /**
+     * Simple phase correction test for zero order phase using simulated data.
+     * @throws Exception
+     */
+    @Test
+    public void testPH0Correction() throws Exception {
+        Acqu acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
+        // The simulated data is for DISP
+        acquisition.setAcquisitionMode(Acqu.AcquisitionMode.DISP);
+        System.out.println(acquisition.getAcquisitionMode().toString());
+        acquisition.setAquiredPoints(fid.length);
+        acquisition.setTransmiterFreq(1); // for bmse000109 is app. 500
+        acquisition.setSpectralWidth(4000); // for bmse000109 is app. 13
+        acquisition.setDspFirmware(10);
+        acquisition.setDspDecimation(1);// pass through the dsp phase correction without changing the data
+        Spectrum spectrum = new Spectrum(fid,acquisition);
+        spectrum.setRealChannelData(realRaw);
+        spectrum.setImaginaryChannelData(imagRaw);
+        PhaseCorrector phaseCorrector = new SimplePhaseCorrector();
+        Spectrum phasedSpectrum = phaseCorrector.phaseCorrection(spectrum,-0.4*360,0);
+        Assert.assertArrayEquals("Numerical deviation above 1E-9", realPH0, phasedSpectrum.getRealChannelData(),1E-9);
+        Assert.assertArrayEquals("Numerical deviation above 1E-9", imagPH0, phasedSpectrum.getImaginaryChannelData(),1E-9);
+    }
+
+    @Ignore
     @Test
     public void testPhaseCorrection() throws Exception {
         data = new XYSeries("spectra");
@@ -68,16 +134,16 @@ public class SimplePhaseCorrectorTest {
 
 
         // extract the actual spectra from the quadrature spectrum
-        for (int i = realTransformed.length/2; i< realTransformed.length; i+=2){
-            realChannel[i/2]= realTransformed[2 * (i - realTransformed.length / 2)];
-            imaginaryChannel[i/2]=realTransformed[2 * (i - realTransformed.length / 2)+1];
-        }
-        for (int i = 0; i< (realTransformed.length/2); i+=2){
-            realChannel[i/2]= realTransformed[2*(i + realTransformed.length / 4)];
-            imaginaryChannel[i/2]=realTransformed[2 * (i + realTransformed.length / 4)+1];
-//            realChannel[i]= partialFID[2 * (i + partialFID.length / 2)];
-//            imaginaryChannel[i/2]=partialFID[2 * (i + partialFID.length / 2)+1];
-        }
+//        for (int i = realTransformed.length/2; i< realTransformed.length; i+=2){
+//            realChannel[i/2]= realTransformed[2 * (i - realTransformed.length / 2)];
+//            imaginaryChannel[i/2]=realTransformed[2 * (i - realTransformed.length / 2)+1];
+//        }
+//        for (int i = 0; i< (realTransformed.length/2); i+=2){
+//            realChannel[i/2]= realTransformed[2*(i + realTransformed.length / 4)];
+//            imaginaryChannel[i/2]=realTransformed[2 * (i + realTransformed.length / 4)+1];
+////            realChannel[i]= partialFID[2 * (i + partialFID.length / 2)];
+////            imaginaryChannel[i/2]=partialFID[2 * (i + partialFID.length / 2)+1];
+//        }
 
         for(int i =0 ; i< realChannel.length; i++){
             data.add(i/2,realChannel[i]);

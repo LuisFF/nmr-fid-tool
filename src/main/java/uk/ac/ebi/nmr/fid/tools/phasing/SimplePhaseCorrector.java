@@ -36,6 +36,15 @@ public class SimplePhaseCorrector implements PhaseCorrector {
         return phaseCorrection(spectrum, zeroPhase, firstOrderPhase,0);
     }
 
+    /**
+     * Implementation based in the definitions from paper {Chen:2012vj}
+     *
+     * @param spectrum
+     * @param zeroPhase
+     * @param firstOrderPhase
+     * @param pivot
+     * @return
+     */
     @Override
     public Spectrum phaseCorrection(Spectrum spectrum, double zeroPhase, double firstOrderPhase, int pivot) {
         double [] realChannel = new double[spectrum.getAcqu().getAquiredPoints()/2];
