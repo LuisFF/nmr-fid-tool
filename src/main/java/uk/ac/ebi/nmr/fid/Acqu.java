@@ -247,7 +247,8 @@ public class Acqu {
     public enum AcquisitionMode {
         SEQUENTIAL      (1),
         SIMULTANIOUS    (2),
-        DISP            (3);
+        DISP            (3),
+        CUSTOM_DISP     (4);
 
         private final int type;
 

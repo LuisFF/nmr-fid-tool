@@ -234,7 +234,7 @@ public class DSPPhaseCorrection {
 
             }
         } else if ((spectrum.getAcqu().getDspFirmware() >= 20 && spectrum.getAcqu().getDspFirmware() <= 23) ||
-                spectrum.getAcqu().getAcquisitionMode().equals(Acqu.AcquisitionMode.DISP)) {
+                spectrum.getAcqu().getAcquisitionMode().equals(Acqu.AcquisitionMode.CUSTOM_DISP)) {
             phase = spectrum.getAcqu().getDspGroupDelay() * 360;
         } else {
             phase = 0;
@@ -244,8 +244,10 @@ public class DSPPhaseCorrection {
 
         for (int i = 0; i < spectrum.getFid().length/2; i++) {
             double phaseAngle = 2 * Math.PI / 360 * i / (spectrum.getFid().length/2) * phase;
-            fid[i*2] = spectrum.getFid()[i*2] * Math.cos(phaseAngle) + spectrum.getFid()[i*2+1] * Math.sin(phaseAngle);
-            fid[i*2+1] = spectrum.getFid()[i*2] * Math.sin(phaseAngle) - spectrum.getFid()[i*2+1] * Math.cos(phaseAngle);
+            // real channel are even positions
+            fid[i*2] = spectrum.getFid()[i*2] * Math.cos(phaseAngle) - spectrum.getFid()[i*2+1] * Math.sin(phaseAngle);
+            // imaginary channel are off positions
+            fid[i*2+1] = spectrum.getFid()[i*2] * Math.sin(phaseAngle) + spectrum.getFid()[i*2+1] * Math.cos(phaseAngle);
             
         }
 

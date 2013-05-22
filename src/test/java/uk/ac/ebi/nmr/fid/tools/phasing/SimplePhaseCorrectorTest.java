@@ -40,11 +40,16 @@ public class SimplePhaseCorrectorTest {
     static double [] realPH0;
     static double [] imagRaw;
     static double [] imagPH0;
+    static double [] fidBmse000109;
+    static double [] fidBmse000109DspCorrected;
+    static double [] fidBmse000066;
+    static double [] fidBmse000066DspCorrected;
     XYSeries data;
 
     @BeforeClass
     public static void loadExternalData () {
         try{
+            // data for simple test in phasing (zero order)
             fid= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
                     .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-sim-raw-dsp.ser"));
             realRaw= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
@@ -55,6 +60,22 @@ public class SimplePhaseCorrectorTest {
                     .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-fft-phased-1r-sim-dsp.ser"));
             imagPH0= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
                     .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-fft-phased-1i-sim-dsp.ser"));
+
+            // data for dsp correction
+            double[] tmp = (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/bmse000109/1h/fid-raw.ser"));
+            fidBmse000109=new double[tmp.length-140];
+            System.arraycopy(tmp,140,fidBmse000109,0,tmp.length-140);
+            fidBmse000109DspCorrected= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/bmse000109/1h/fid-DSPCorr.ser"));
+
+            tmp = (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/bmse000066/1h/fid-raw.ser"));
+            fidBmse000066=new double[tmp.length-140];
+            System.arraycopy(tmp,140,fidBmse000066,0,tmp.length-140);
+            fidBmse000066DspCorrected= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/bmse000066/1h/fid-DSPCorr.ser"));
+
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (ClassNotFoundException e) {
@@ -86,8 +107,8 @@ public class SimplePhaseCorrectorTest {
         acquisition.setAcquisitionMode(Acqu.AcquisitionMode.DISP);
         System.out.println(acquisition.getAcquisitionMode().toString());
         acquisition.setAquiredPoints(fid.length);
-        acquisition.setTransmiterFreq(1); // for bmse000109 is app. 500
-        acquisition.setSpectralWidth(4000); // for bmse000109 is app. 13
+        acquisition.setTransmiterFreq(1);   // required to calculate the DW
+        acquisition.setSpectralWidth(4000); // required to calculate the DW
         acquisition.setDspFirmware(10);
         acquisition.setDspDecimation(1);// pass through the dsp phase correction without changing the data
         Spectrum spectrum = new Spectrum(fid,acquisition);
@@ -97,6 +118,69 @@ public class SimplePhaseCorrectorTest {
         Spectrum phasedSpectrum = phaseCorrector.phaseCorrection(spectrum,-0.4*360,0);
         Assert.assertArrayEquals("Numerical deviation above 1E-9", realPH0, phasedSpectrum.getRealChannelData(),1E-9);
         Assert.assertArrayEquals("Numerical deviation above 1E-9", imagPH0, phasedSpectrum.getImaginaryChannelData(),1E-9);
+    }
+
+    /**
+     * Test DSP version with phase set case by case. Acquisition mode DISP.
+     * @throws Exception
+     */
+    @Test
+    public void testDSPCorrectionBmse000066() throws Exception {
+        Acqu acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
+        acquisition.setAcquisitionMode(Acqu.AcquisitionMode.DISP);
+        acquisition.setAquiredPoints(fidBmse000066.length);
+        acquisition.setSpectralWidth(12.0152693165838);
+        acquisition.setTransmiterFreq(400.131880611);
+        acquisition.setDspFirmware(12);
+        acquisition.setDspDecimation(32);
+        Spectrum spectrum = new Spectrum(fidBmse000066,acquisition);
+        DSPPhaseCorrection dspPhaseCorrector = new DSPPhaseCorrection();
+        Spectrum dspPhasedSpectrum = dspPhaseCorrector.dspPhaseCorrection(spectrum);
+        Assert.assertArrayEquals("Numerical deviation above 1E-9", fidBmse000066DspCorrected,
+                dspPhasedSpectrum.getFid(),1E-9);
+    }
+
+    /**
+     * Test DSP version with phase calculated using group delay information. Acquisition mode DISP.
+     * @throws Exception
+     */
+    @Test
+    public void testDSPCorrectionBmse000109() throws Exception {
+        Acqu acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
+        acquisition.setAcquisitionMode(Acqu.AcquisitionMode.DISP);
+        acquisition.setAquiredPoints(fidBmse000109.length);
+        acquisition.setSpectralWidth(12.9911091032519);
+        acquisition.setTransmiterFreq(499.842349248);
+        acquisition.setDspGroupDelay(67.985595703125);// required for this DSP version
+        acquisition.setDspFirmware(20);
+        acquisition.setDspDecimation(3080);
+        Spectrum spectrum = new Spectrum(fidBmse000109,acquisition);
+        DSPPhaseCorrection dspPhaseCorrector = new DSPPhaseCorrection();
+        Spectrum dspPhasedSpectrum = dspPhaseCorrector.dspPhaseCorrection(spectrum);
+        // the precision of 1E-7 is a bit irrelevant given that we are working with large integers
+        Assert.assertArrayEquals("Numerical deviation above 1E-7", fidBmse000109DspCorrected,
+                dspPhasedSpectrum.getFid(),1E-7);
+    }
+
+    /**
+     * Test DSP version for which there is no phase set. Acquisition mode DISP.
+     * @throws Exception
+     */
+    @Test
+    public void testDSPCorrectionNoPhase() throws Exception {
+        Acqu acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
+        acquisition.setAcquisitionMode(Acqu.AcquisitionMode.DISP);
+        acquisition.setAquiredPoints(fidBmse000109.length);
+        acquisition.setSpectralWidth(12.9911091032519);
+        acquisition.setTransmiterFreq(499.842349248);
+        acquisition.setDspGroupDelay(67.985595703125);
+        acquisition.setDspFirmware(30); // there is no phase for this DSP version
+        acquisition.setDspDecimation(3080);
+        Spectrum spectrum = new Spectrum(fidBmse000109,acquisition);
+        DSPPhaseCorrection dspPhaseCorrector = new DSPPhaseCorrection();
+        Spectrum dspPhasedSpectrum = dspPhaseCorrector.dspPhaseCorrection(spectrum);
+        Assert.assertArrayEquals("Numerical deviation above 1E-9", fidBmse000109,
+                dspPhasedSpectrum.getFid(),1E-9);
     }
 
     @Ignore
