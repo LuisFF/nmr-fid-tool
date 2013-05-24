@@ -15,10 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ebi.nmr.fid;
+package uk.ac.ebi.nmr.fid.tools;
+
+import uk.ac.ebi.nmr.fid.Spectrum;
 
 /**
- * @name    FastFourierTransformTool
+ * @name    FastFourierTransform
  * @date    2013.01.31
  * @version $Rev$ : Last Changed $Date$
  *
@@ -27,9 +29,8 @@ package uk.ac.ebi.nmr.fid;
  * @brief   interface for the FFT calss
  *
  */
-public interface FastFourierTransformTool {
+public interface FastFourierTransform {
 
-    double[] computeFFT();
-    Proc getProcessing();
-    
+    Spectrum computeFFT();
+
 }
