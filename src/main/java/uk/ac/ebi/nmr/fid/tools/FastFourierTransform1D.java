@@ -38,14 +38,14 @@ public class FastFourierTransform1D implements FastFourierTransform {
     }
 
     @Override
-    public Spectrum computeFFT() {
+    public Spectrum computeFFT(int offset) {
         double [] fid = spectrum.getFid();
         double [] realPart;
         double [] imaginaryPart;
 
         // run the FFT
-        DoubleFFT_1D fftd = new DoubleFFT_1D(fid.length/2);
-        fftd.complexForward(fid);
+        DoubleFFT_1D fftd = new DoubleFFT_1D(fid.length/2-offset);
+        fftd.complexForward(fid,offset);
 
         double [] realChannel = new double[fid.length/2];
         double [] imagChannel = new double[fid.length/2];
@@ -75,5 +75,10 @@ public class FastFourierTransform1D implements FastFourierTransform {
         spectrum.setRealChannelData(tmpReal);
         spectrum.setImaginaryChannelData(tmpImag);
         return spectrum;
+    }
+
+    @Override
+    public Spectrum computeFFT() {
+        return computeFFT(0);
     }
 }

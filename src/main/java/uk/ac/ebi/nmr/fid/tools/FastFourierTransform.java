@@ -33,4 +33,6 @@ public interface FastFourierTransform {
 
     Spectrum computeFFT();
 
+    Spectrum computeFFT(int offset);
+
 }
