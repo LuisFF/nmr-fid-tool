@@ -35,6 +35,8 @@ public class Spectrum {
     private double [] fid;
     private double [] realChannelData;
     private double [] imaginaryChannelData;
+    private double [] baselineModel;
+    private boolean [] baseline;
 
     public Spectrum(double[] fid, Acqu acqu, Proc proc) {
         this.fid=fid;
@@ -91,5 +93,21 @@ public class Spectrum {
             realChannelData[i/2]=fid[i];// real are in even positions
             imaginaryChannelData[i/2]=fid[i+1];// imaginary are in odd positions
         }
+    }
+
+    public double[] getBaselineModel() {
+        return baselineModel;
+    }
+
+    public void setBaselineModel(double[] baselineModel) {
+        this.baselineModel = baselineModel;
+    }
+
+    public boolean[] getBaseline() {
+        return baseline;
+    }
+
+    public void setBaseline(boolean[] baseline) {
+        this.baseline = baseline;
     }
 }
