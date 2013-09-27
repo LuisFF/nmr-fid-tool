@@ -1,6 +1,11 @@
 *.class
 target
+*.csv
+.idea
+src/test/java/resources/bmrb
+src/test/java/resources/spectra_png
 # Package Files #
 *.jar
 *.war
 *.ear
+*.iml

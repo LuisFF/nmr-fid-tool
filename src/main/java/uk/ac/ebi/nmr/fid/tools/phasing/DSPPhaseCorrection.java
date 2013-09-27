@@ -10,17 +10,17 @@ import uk.ac.ebi.nmr.fid.Spectrum;
  *
  */
 public class DSPPhaseCorrection {
-    private final Spectrum spectrum;
 
-    public DSPPhaseCorrection(Spectrum spectrum) {
-        this.spectrum = spectrum;
-    }
+
+//    public DSPPhaseCorrection() {
+//
+//    }
 
     /**
      * Method to calculate the initial phase correction due to the digital filter. This method was based on the
      * information available in the dsp_phase of SpinWorks from Prof. Kirk Marat
      */
-    public void dspPhaseCorrection() {
+    public Spectrum dspPhaseCorrection(Spectrum spectrum) {
         double phase = 0;
         if (spectrum.getAcqu().getDspFirmware() == 10) {
             switch (spectrum.getAcqu().getDspDecimation()) {
@@ -234,24 +234,23 @@ public class DSPPhaseCorrection {
 
             }
         } else if ((spectrum.getAcqu().getDspFirmware() >= 20 && spectrum.getAcqu().getDspFirmware() <= 23) ||
-                spectrum.getAcqu().getAcquisitionMode().equals(Acqu.AcquisitionMode.DISP)) {
+                spectrum.getAcqu().getAcquisitionMode().equals(Acqu.AcquisitionMode.CUSTOM_DISP)) {
             phase = spectrum.getAcqu().getDspGroupDelay() * 360;
         } else {
             phase = 0;
             System.err.println("[WARNING] It is not possible to identify the DSP used;");
         }
-        double [] realChannelData = new double[spectrum.getAcqu().getAquiredPoints() / 2];
-        double [] imaginaryChannelData = new double[spectrum.getAcqu().getAquiredPoints() / 2];
+        double [] fid = new double[spectrum.getFid().length];
 
-        for (int i = 0; i < spectrum.getAcqu().getAquiredPoints()/2; i++) {
-            double phaseAngle = 2 * Math.PI / 360 * i / (spectrum.getAcqu().getAquiredPoints() / 2) * phase;
-            realChannelData[i] = spectrum.getRealChannelData()[i] * Math.cos(phaseAngle) +
-                    spectrum.getImaginaryChannelData()[i] * Math.sin(phaseAngle);
-            // I had to remove the - signal (in the R script is working fine...)
-            imaginaryChannelData[i] = spectrum.getRealChannelData()[i] * Math.sin(phaseAngle)
-                    + spectrum.getImaginaryChannelData()[i] * Math.cos(phaseAngle);
+        for (int i = 0; i < spectrum.getFid().length/2; i++) {
+            double phaseAngle = 2 * Math.PI / 360 * i / (spectrum.getFid().length/2) * phase;
+            // real channel are even positions
+            fid[i*2] = spectrum.getFid()[i*2] * Math.cos(phaseAngle) - spectrum.getFid()[i*2+1] * Math.sin(phaseAngle);
+            // imaginary channel are off positions
+            fid[i*2+1] = spectrum.getFid()[i*2] * Math.sin(phaseAngle) + spectrum.getFid()[i*2+1] * Math.cos(phaseAngle);
+            
         }
-        spectrum.setRealChannelData(realChannelData);
-        spectrum.setImaginaryChannelData(imaginaryChannelData);
+
+        return new Spectrum(fid,spectrum.getAcqu(),spectrum.getProc());
     }
 }

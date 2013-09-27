@@ -33,13 +33,12 @@ import org.junit.Test;
 import uk.ac.ebi.nmr.fid.Acqu;
 import uk.ac.ebi.nmr.fid.Proc;
 import uk.ac.ebi.nmr.fid.Spectrum;
+import uk.ac.ebi.nmr.fid.io.FidReader;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 
 /**
  * Tests for various window functions
@@ -67,148 +66,91 @@ public class ApodizatorTest {
     static double [] realFTObserved;
     static double [] imaginaryFTObserved;
 
-    static double dw=0.01;
-
     XYSeries data;
     static XYSeries dataR;
 
     @BeforeClass
     public static void loadExternalData () {
 
-        final Pattern DATAROW_PATTERN = Pattern.compile("(-?\\d+\\.?\\d*e?-?\\+?\\d*)");
-        final Pattern DATA_PATTERN = Pattern
-                .compile("(-?\\d+\\.\\d+e?-?\\+?\\d+)\\s+(-?\\d+\\.\\d+e?-?\\+?\\d+)\\s+(-?\\d+\\.\\d+e?-?\\+?\\d+)"+
-                "\\s+(-?\\d+\\.\\d+e?-?\\+?\\d+)\\s+(-?\\d+\\.\\d+e?-?\\+?\\d+)\\s+(-?\\d+\\.\\d+e?-?\\+?\\d+)"+
-                "\\s+(-?\\d+\\.\\d+e?-?\\+?\\d+)\\s+(-?\\d+\\.\\d+e?-?\\+?\\d+)\\s+(-?\\d+\\.\\d+e?-?\\+?\\d+)");
-        
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ApodizatorTest.class.getClassLoader()
-                .getResourceAsStream("data/fid-simulated.csv")));
-        int lines = 0;
-        // count the number of lines
-        // which corresponds to the number of data points if one removes the header line
-        try {
-
-            bufferedReader.readLine();
-            while (bufferedReader.readLine() != null) lines++;
-
-            bufferedReader.close();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        fid = new double[lines];
-        double[] fid4spectrum = new double[lines];
-        fidApodizedEM = new double[lines];
-        fidApodizedGM = new double[lines];
-        fidApodizedLGM = new double[lines];
-        fidApodizedTRAF = new double[lines];
-        fidApodizedTRAFS = new double[lines];
-        realFTObserved = new double[lines];
-        imaginaryFTObserved = new double[lines];
-
-        bufferedReader = new BufferedReader(new InputStreamReader(ApodizatorTest.class.getClassLoader()
-                .getResourceAsStream("data/fid-simulated.csv")));
-
-
 
         try {
-            String line = bufferedReader.readLine();
-            int index = 0;
-            Matcher matcher = null;
-            dataR = new XYSeries("dataR");
+            // the dsp in the name corresponds to the aquisition mode and to the the group delay correction
+            fid= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-sim-raw-dsp.ser"));
+            fidApodizedGM= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-apgm-sim-dsp.ser"));
+            fidApodizedEM= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-apem-sim-dsp.ser"));
+            fidApodizedLGM= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-aplgm-sim-dsp.ser"));
+            fidApodizedTRAF= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-aptrafm-sim-dsp.ser"));
+            fidApodizedTRAFS= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+                    .getResourceAsStream("data/simulated/hypothetical-compound/1h/fid-aptrafsm-sim-dsp.ser"));
 
-            while (line != null){
-                matcher = DATAROW_PATTERN.matcher(line);
-                if(matcher.find()){
-                    int matchEnd=0;
-                    int times =0;
-                    while (matcher.find(matchEnd)){
-                        matchEnd=matcher.end();
-//                        System.out.println("Pattern found "+ new String(new char[times]).replace("\0","\t" )
-//                                +Double.parseDouble(matcher.group(1)));
-                        switch (times){
-                            case 0 :
-                                fid[index]=Double.parseDouble(matcher.group(1));
-                                break;
-                            case 1 :
-                                fid4spectrum[index]=Double.parseDouble(matcher.group(1));
-                                break;
-                            case 2 :
-                                realFTObserved[index]=Double.parseDouble(matcher.group(1));
-                                break;
-                            case 3 :
-                                imaginaryFTObserved[index]=Double.parseDouble(matcher.group(1));
-                                break;
-                            case 4 :
-                                fidApodizedEM[index]=Double.parseDouble(matcher.group(1));
-                                break;
-                            case 5 :
-                                fidApodizedGM[index]=Double.parseDouble(matcher.group(1));
-                                break;
-                            case 6 :
-                                fidApodizedLGM[index]=Double.parseDouble(matcher.group(1));
-                                break;
-                            case 7 :
-                                fidApodizedTRAF[index]=Double.parseDouble(matcher.group(1));
-                                break;
-                            case 8 :
-                                fidApodizedTRAFS[index]=Double.parseDouble(matcher.group(1));
-                                break;
-                            default:
-                                break;
-                        }
-                        ++times;
-                    }
-                    dataR.add(index*dw,fid4spectrum[index]);
-                    ++index;
-                }
-
-                line=bufferedReader.readLine();
-            }
-            System.out.println(index);
             acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
-            // The test data I have is sequencial, meaning that I have only the FID of the real channel
-            // The simultaneous would have the value of the real channel followed by the corresponding value of the
-            // imaginary chanel
-            acquisition.setAcquisitionMode(Acqu.AcquisitionMode.SEQUENTIAL);
+            // The simulated data is for DISP
+            acquisition.setAcquisitionMode(Acqu.AcquisitionMode.DISP);
             System.out.println(acquisition.getAcquisitionMode().toString());
             acquisition.setAquiredPoints(fid.length);
-            acquisition.setTransmiterFreq(8 + 1 / 3); // for bmse000109 is app. 500
-            acquisition.setSpectralWidth(6.25); // for bmse000109 is app. 13
-            processing = new Proc(acquisition);
-            processing.setLineBroadening(1);
-            processing.setGbFactor(0.03);
-            System.out.println("DW: " +processing.getDwellTime());
-            System.out.println("LB: " +processing.getLineBroadening());
-            spectrum = new Spectrum(fid4spectrum,acquisition);
+//            acquisition.setTransmiterFreq(8 + 1 / 3); // for bmse000109 is app. 500
+//            acquisition.setSpectralWidth(6.25); // for bmse000109 is app. 13
+            acquisition.setTransmiterFreq(1); // for bmse000109 is app. 500
+            acquisition.setSpectralWidth(4000); // for bmse000109 is app. 13
+            acquisition.setDspFirmware(10);
+            acquisition.setDspDecimation(1);// pass through the dsp phase correction without changing the data
+//            processing = new Proc(acquisition);
+//            processing.setLineBroadening(0.3);
+//            processing.setGbFactor(0.03);
+//            System.out.println("DW: " +processing.getDwellTime());
+//            System.out.println("LB: " +processing.getLineBroadening());
+            spectrum = new Spectrum(fid,acquisition);
+            dataR = new XYSeries("original fid");
+            for (int i = 0 ; i< fid.length; i++)
+                dataR.add(i,fid[i]);
 
         } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        }
-
-        @Test
-        public void TestExponentialApodizatorSequential(){
-            data = new XYSeries("data");
-
-            Apodizator expApodizator= new ExponentialApodizator(spectrum);
 
 
-            try {
-                Spectrum apodizedSpectrum = expApodizator.calculate(1);
+    }
+
+    private static Object loadSerializedObject(InputStream inputStream) throws IOException, ClassNotFoundException {
+        long startTime = System.currentTimeMillis();
+        ObjectInputStream ois = new ObjectInputStream(inputStream);
+        Object serializedOject = ois.readObject();
+        long endTime   = System.currentTimeMillis();
+        System.out.println("Time reading object in "+inputStream.toString()+":\t\t"+(endTime - startTime)+" ms");
+        return serializedOject;
+    }
+
+    @Test
+
+    public void TestExponentialApodizatorDISP(){
+
+        Assert.assertNotNull("FID was not properly read",spectrum.getFid());
+
+        data = new XYSeries("data");
+        Apodizator expApodizator= new ExponentialApodizator(spectrum);
+
+        try {
+            Spectrum apodizedSpectrum = expApodizator.calculate(0.3);
             boolean controlSTERR = false;
+            Assert.assertArrayEquals("Numerical deviation above 1E-12", fidApodizedEM, apodizedSpectrum.getFid(),1E-12);
+            // consider removing this bit below
+
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
-                data.add(i*dw,apodizedSpectrum.getFid()[i]);
+                data.add(i, apodizedSpectrum.getFid()[i]);
                 if(!(controlSTERR) && Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedEM[i])>1E-12) {
                     System.err.println("Exponential apodization with deviation larger than 1E-12");
-                    System.err.println(i+" "+ fidApodizedEM[i]+" "+ apodizedSpectrum.getFid()[i]);
+                    System.err.println(i + " " + fidApodizedEM[i] + " " + apodizedSpectrum.getFid()[i]);
                     controlSTERR=true;
                 }
-                Assert.assertTrue("Numerical deviation above 1E-12",
-                        Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedEM[i])<1E-12);
-
             }
             } catch (Exception e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -224,15 +166,19 @@ public class ApodizatorTest {
     }
 
     @Test
-    public void TestGaussianApodizatorSequential(){
+    public void TestGaussianApodizatorDISP(){
         data = new XYSeries("data");
+
         Apodizator gaussApodizator= new GaussianApodizator(spectrum);
 
         try {
-            Spectrum apodizedSpectrum = gaussApodizator.calculate(1);
+            Spectrum apodizedSpectrum = gaussApodizator.calculate(0.3);
+            Assert.assertArrayEquals("Numerical deviation above 1E-12", fidApodizedGM, apodizedSpectrum.getFid(),1E-12);
+
+            // consider removing this bit below
             boolean controlSTERR = false;
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
-                data.add(i*dw,apodizedSpectrum.getFid()[i]);
+                data.add(i,apodizedSpectrum.getFid()[i]);
                 if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedGM[i])>1E-12) {
                     if(!controlSTERR){
                         System.err.println("Gaussian apodization with deviation larger than 1E-12");
@@ -240,9 +186,6 @@ public class ApodizatorTest {
                         controlSTERR=true;
                     }
                 }
-                Assert.assertTrue("Numerical deviation above 1E-12",
-                        Math.abs(apodizedSpectrum.getFid()[i] - fidApodizedGM[i]) < 1E-12);
-
             }
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -259,26 +202,31 @@ public class ApodizatorTest {
     }
 
     @Test
-    public void TestLorentzGausApodizatorSequential(){
+    public void TestLorentzGausApodizatorDISP(){
         data = new XYSeries("data");
         Apodizator lgApodizator= new LorentzGausApodizatior(spectrum);
+        spectrum.getProc().setGbFactor(0.03);
+        //changes in the definition of the TdEffective will affect LotentzGaus, TRAF and TRAFS Apodizators
+        spectrum.getProc().setTdEffective(acquisition.getAquiredPoints()/2);
 
         try {
             Spectrum apodizedSpectrum = lgApodizator.calculate(-0.3);
+            Assert.assertArrayEquals("Numerical deviation above 1E-4", fidApodizedLGM, apodizedSpectrum.getFid(),1E-4);
+            // consider removing this bit below
             boolean controlSTERR = false;
             int count=0;
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
-                data.add(i*dw,apodizedSpectrum.getFid()[i]);
-                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedLGM[i])>1E-3) {
+                data.add(i,apodizedSpectrum.getFid()[i]);
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedLGM[i])>1E-5) {
                     if(!(controlSTERR)){
-                    System.err.println("Lorentz-Gauss apodization with deviation larger than 1E-3");
+                    System.err.println("Lorentz-Gauss apodization with deviation larger than 1E-5");
                     System.err.println(i+" "+fidApodizedLGM[i]+" "+ apodizedSpectrum.getFid()[i]);
                         controlSTERR=true;
                     }
                     count++;
                 }
             }
-            System.out.println("Lorentz-Gauss apodization deviations above 1E-3: "+count);
+            System.out.println("Lorentz-Gauss apodization deviations above 1E-5: "+count);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -300,22 +248,22 @@ public class ApodizatorTest {
 
         try {
             Spectrum apodizedSpectrum = tarfApodizator.calculate(0.06);
+            Assert.assertArrayEquals("Numerical deviation above 1E-5", fidApodizedTRAF, apodizedSpectrum.getFid(),1E-5);
+            // consider removing this bit below
             boolean controlSTERR = false;
             int count = 0;
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
-                data.add(i*dw,apodizedSpectrum.getFid()[i]);
-                Assert.assertTrue("Numerical deviation above 1E-3",
-                        Math.abs(apodizedSpectrum.getFid()[i] - fidApodizedTRAF[i]) < 1E-3);
-                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAF[i])>1E-4) {
+                data.add(i,apodizedSpectrum.getFid()[i]);
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAF[i])>1E-6) {
                     if(!(controlSTERR)){
-                    System.err.println("TRAF apodization with deviation larger than 1E-4");
+                    System.err.println("TRAF apodization with deviation larger than 1E-6");
                     System.err.println(i+" "+fidApodizedTRAF[i]+" "+ apodizedSpectrum.getFid()[i]);
                     controlSTERR=true;
                     }
                     count++;
                 }
             }
-            System.out.println("TRAF apodization deviations above 1E-4: "+count);
+            System.out.println("TRAF apodization deviations above 1E-6: "+count);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -332,28 +280,28 @@ public class ApodizatorTest {
     }
 
     @Test
-    public void TestTRAFSApodizatorSequential(){
+    public void TestTRAFSApodizatorDISP(){
         data = new XYSeries("data");
         Apodizator tarfsApodizator= new TrafsApodizator(spectrum);
 
         try {
             Spectrum apodizedSpectrum = tarfsApodizator.calculate(0.06);
+            Assert.assertArrayEquals("Numerical deviation above 1E-4", fidApodizedTRAFS, apodizedSpectrum.getFid(),1E-4);
+            // consider removing this bit below
             boolean controlSTERR = false;
             int count = 0;
             for (int i =0; i< apodizedSpectrum.getFid().length;i++){
-                data.add(i*dw,apodizedSpectrum.getFid()[i]);
-                Assert.assertTrue("Numerical deviation above 1E-3",
-                        Math.abs(apodizedSpectrum.getFid()[i] - fidApodizedTRAFS[i ]) < 1E-3);
-                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAFS[i])>1E-4) {
+                data.add(i,apodizedSpectrum.getFid()[i]);
+                if(Math.abs(apodizedSpectrum.getFid()[i]-fidApodizedTRAFS[i])>1E-5) {
                     if(!(controlSTERR) ){
-                    System.err.println("TRAFS apodization with deviation larger than 1E-4");
+                    System.err.println("TRAFS apodization with deviation larger than 1E-5");
                     System.err.println(i+" "+fidApodizedTRAFS[i]+" "+ apodizedSpectrum.getFid()[i]);
                     controlSTERR=true;
                     }
                     count++;
                 }
             }
-            System.out.println("TRAFS apodization deviations above 1E-4: "+count);
+            System.out.println("TRAFS apodization deviations above 1E-5: "+count);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

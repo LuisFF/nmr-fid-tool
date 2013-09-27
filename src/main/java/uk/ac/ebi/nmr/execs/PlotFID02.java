@@ -34,15 +34,12 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 import uk.ac.ebi.nmr.fid.Acqu;
-import uk.ac.ebi.nmr.fid.FastFourierTransformTool;
-import uk.ac.ebi.nmr.fid.JTransformFFTTool;
 import uk.ac.ebi.nmr.fid.Proc;
 import uk.ac.ebi.nmr.fid.Spectrum;
 import uk.ac.ebi.nmr.fid.io.AcquReader;
 import uk.ac.ebi.nmr.fid.io.BrukerAcquReader;
 import uk.ac.ebi.nmr.fid.io.ConnjurFidReader;
 import uk.ac.ebi.nmr.fid.io.FidReader;
-import uk.ac.ebi.nmr.fid.tools.PhaseCorrectionTool;
 
 import javax.swing.*;
 import java.io.File;
@@ -277,30 +274,14 @@ public class PlotFID02 extends JFrame {
         final XYSeries data = new XYSeries("data");
         Acqu acquisition = (new BrukerAcquReader(PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/acqu"))).read();
         InputStream fidInput = PlotFID02.class.getResourceAsStream("/examples/file_formats/bmse000109/1H/fid");
-        FastFourierTransformTool ft;
+
         FidReader fidReader = new ConnjurFidReader(new File("/Users/ldpf/SVN/ldpf/dev/nmr-tools/src/test/java/"+
                 "resources/examples/file_formats/bmse000109/1H/"), acquisition);
 //        Fid fid = new FidReader(fidInput, acquisition).read();
         Spectrum spectrum = fidReader.read();
         System.out.println("numeber of points: " + spectrum.getFid().length);
 
-        ft = new JTransformFFTTool(spectrum);
-        System.out.println("total number of effective points: "+ ft.getProcessing().getTdEffective());
 
-        Long milis = System.currentTimeMillis();
-        double[] spectrumFFT = ft.computeFFT();
-        System.out.println("FFT timimg "+ft.getClass().getCanonicalName()+" "+(System.currentTimeMillis() - milis)+" ms ");
-//                ft.fft(true);
-//                spectrum=ft.getData();
-        //for (int i = 0; i < fid.getData().length; i++) {
-
-        PhaseCorrectionTool phaseCorrectionTool = new PhaseCorrectionTool(spectrumFFT, new Proc(acquisition));
-        double [] spectrumPhased = phaseCorrectionTool.zeroOrderPhasing(0.2);
-        for (int i = 1; i < spectrumFFT.length; i+=2) {
-            //data.add(i * ft.getProcessing().getDwellTime(), spectrum[i]);
-//            data.add(i*ft.getProcessing().getDwellTime()/(acquisition.getAquiredPoints()*ft.getProcessing().getDwellTime()), spectrum[i]);
-            data.add(i*ft.getProcessing().getDwellTime()/(acquisition.getAquiredPoints()*ft.getProcessing().getDwellTime()), spectrumFFT[i]);
-        }
         dataset.addSeries(data);
     }
 

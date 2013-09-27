@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013. EMBL, European Bioinformatics Institute
+ * Copyright (c) 2013 EMBL, European Bioinformatics Institute.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,21 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package uk.ac.ebi.nmr.fid;
+package uk.ac.ebi.nmr.fid.tools.baseline;
+
+import uk.ac.ebi.nmr.fid.Spectrum;
 
 /**
- * @name    FastFourierTransformTool
- * @date    2013.01.31
- * @version $Rev$ : Last Changed $Date$
+ * Class for baseline correction
  *
- * @author Luis F. de Figueiredo
- * @author  pmoreno
- * @brief   interface for the FFT calss
+ * @author  Luis F. de Figueiredo
  *
+ * User: ldpf
+ * Date: 29/05/2013
+ * Time: 15:38
+ * To change this template use File | Settings | File Templates.
  */
-public interface FastFourierTransformTool {
+public interface BaselineCorrector {
 
-    double[] computeFFT();
-    Proc getProcessing();
-    
+    Spectrum correctBaseline(Spectrum spectrum);
 }
