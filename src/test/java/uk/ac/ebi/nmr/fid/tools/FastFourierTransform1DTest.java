@@ -29,13 +29,11 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.Test;
 import uk.ac.ebi.nmr.fid.Acqu;
+import uk.ac.ebi.nmr.fid.Serializer;
 import uk.ac.ebi.nmr.fid.Spectrum;
-import uk.ac.ebi.nmr.fid.io.FidReader;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -55,12 +53,15 @@ public class FastFourierTransform1DTest {
     public void testFFTBmse000109() throws Exception {
 
 
-        double [] fidBmse000109DspCorrected= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+        double [] fidBmse000109DspCorrected= (double[]) Serializer.loadSerializedObject(
+                FastFourierTransform1DTest.class.getClassLoader()
                 .getResourceAsStream("data/bmse000109/1h/fid-DSPCorr.ser"));
 
-        double [] fidBmse000109FFT1r= (double[]) loadSerializedObject (FidReader.class.getClassLoader()
+        double [] fidBmse000109FFT1r= (double[]) Serializer.loadSerializedObject (
+                FastFourierTransform1DTest.class.getClassLoader()
                 .getResourceAsStream("data/bmse000109/1h/fid-fft-1r.ser"));
-        double [] fidBmse000109FFT1i= (double[]) loadSerializedObject (FidReader.class.getClassLoader()
+        double [] fidBmse000109FFT1i= (double[]) Serializer.loadSerializedObject (
+                FastFourierTransform1DTest.class.getClassLoader()
                 .getResourceAsStream("data/bmse000109/1h/fid-fft-1i.ser"));
 
         Acqu acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
@@ -131,12 +132,15 @@ public class FastFourierTransform1DTest {
     public void testFFTBmse000109Raw() throws Exception {
 
 
-        double [] fidBmse000109DSPCorr= (double[]) loadSerializedObject(FidReader.class.getClassLoader()
+        double [] fidBmse000109DSPCorr= (double[]) Serializer.loadSerializedObject(
+                FastFourierTransform1DTest.class.getClassLoader()
                 .getResourceAsStream("data/bmse000109/1h/fid-DSPCorr-full.ser"));
 
-        double [] fidBmse000109FFT1r= (double[]) loadSerializedObject (FidReader.class.getClassLoader()
+        double [] fidBmse000109FFT1r= (double[]) Serializer.loadSerializedObject (
+                FastFourierTransform1DTest.class.getClassLoader()
                 .getResourceAsStream("data/bmse000109/1h/fid-fft-1r-full.ser"));
-        double [] fidBmse000109FFT1i= (double[]) loadSerializedObject (FidReader.class.getClassLoader()
+        double [] fidBmse000109FFT1i= (double[]) Serializer.loadSerializedObject (
+                FastFourierTransform1DTest.class.getClassLoader()
                 .getResourceAsStream("data/bmse000109/1h/fid-fft-1i-full.ser"));
 
         Acqu acquisition = new Acqu(Acqu.Spectrometer.BRUKER);
@@ -206,14 +210,6 @@ public class FastFourierTransform1DTest {
         return Math.sqrt(rmsd/shortestLength);
     }
 
-    private static Object loadSerializedObject(InputStream inputStream) throws IOException, ClassNotFoundException {
-        long startTime = System.currentTimeMillis();
-        ObjectInputStream ois = new ObjectInputStream(inputStream);
-        Object serializedOject = ois.readObject();
-        long endTime   = System.currentTimeMillis();
-        System.out.println("Time reading object in "+inputStream.toString()+":\t\t"+(endTime - startTime)+" ms");
-        return serializedOject;
-    }
 
     private JFreeChart createChart(final XYDataset dataset) {
         final JFreeChart chart = ChartFactory.createScatterPlot(
